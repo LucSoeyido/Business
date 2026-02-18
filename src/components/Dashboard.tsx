@@ -103,7 +103,7 @@ export default function Dashboard() {
      
 
       {/* ===== MAIN ===== */}
-      <main className="nxl-container">
+      <main className="nxl-container" style={{backgroundColor:'black',top: '0'}}>
         <div className="nxl-content">
 
           {/* Page header */}

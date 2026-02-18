@@ -32,7 +32,7 @@ export default function Navbar() {
     <>
       {/* ── Barre supérieure mobile (visible seulement < md) ── */}
       <div className="mobile-topbar">
-        <h5 className="mobile-logo">Lucky Business</h5>
+        <h5 className="mobile-logo" style={{ color: 'white', textAlign: "center" }}>Lucky Business</h5>
         <button
           className={`hamburger ${isOpen ? "open" : ""}`}
           onClick={() => setIsOpen(!isOpen)}
@@ -55,10 +55,10 @@ export default function Navbar() {
       )}
 
       {/* ── Sidebar ── */}
-      <nav className={`nxl-navigation ${isOpen ? "mobile-open" : ""}`} >
+      <nav className={`nxl-navigation ${isOpen ? "mobile-open" : ""}`} style={{ backgroundColor: 'black' }} >
         <div className="navbar-wrapper">
-          <div className="m-header p-3" style={{backgroundColor:'#1e1e2d'}}>
-            <h5 style={{color:'blue'}}>Lucky Business</h5>
+          <div className="m-header p-3" style={{ backgroundColor: 'black' }}>
+            <h5 style={{ color: 'white' }}>Lucky Business</h5>
             {/* Bouton fermer (mobile) */}
             <button
               className="close-btn"
@@ -71,25 +71,51 @@ export default function Navbar() {
 
           <div className="navbar-content">
             <ul className="nxl-navbar" >
-              
 
-              <li className="nxl-item">
-                <a style={{color:'blue'}} className="nxl-link" href="#" onClick={() => setIsOpen(false)}>
-                  Dashboard
+
+              <li className="nxl-item nxl-hasmenu" style={{ color: 'white' }}>
+                <a href="javascript:void(0);" className="nxl-link">
+                  <span className="nxl-micon"><i className="feather-airplay"></i></span>
+                  <span className="nxl-mtext" style={{ color: 'white' }}>Dashboards</span><span className="nxl-arrow"><i className="feather-chevron-right"></i></span>
                 </a>
+                <ul className="nxl-submenu">
+                  <li className="nxl-item" ><a style={{ color: 'white' }} className="nxl-link" href="index.html">CRM</a></li>
+                  <li className="nxl-item" ><a style={{ color: 'white' }} className="nxl-link" href="analytics.html">Analytics</a></li>
+                </ul>
               </li>
 
               <li className="nxl-item">
-                <a style={{color:'blue'}} className="nxl-link" href="#" onClick={() => setIsOpen(false)}>
-                  Customers
+
+                <a href="javascript:void(0);" className="nxl-link">
+                  <span className="nxl-micon">  <i className="feather-send"></i></span>
+                  <span className="nxl-mtext" style={{ color: 'white' }}>Session</span><span className="nxl-arrow"><i className="feather-chevron-right"></i></span>
+                </a>
+                <ul className="nxl-submenu">
+                  <li className="nxl-item" ><a style={{ color: 'white' }} className="nxl-link" href="index.html">En cours</a></li>
+                  <li className="nxl-item" ><a style={{ color: 'white' }} className="nxl-link" href="analytics.html">Toutes les sessions</a></li>
+                </ul>
+              </li>
+              <li className="nxl-item">
+
+                <a style={{ color: 'white' }} className="nxl-link" href="#" onClick={() => setIsOpen(false)}>
+                  <span className="nxl-micon"><i className="feather-users"></i></span>
+                  Gestion des utilisateurs
+                </a>
+              </li>
+              <li className="nxl-item">
+                <a style={{ color: 'white' }} className="nxl-link" href="#" onClick={() => setIsOpen(false)}>
+                   <span className="nxl-micon"><i className="feather-dollar-sign"></i></span>
+                  Dépenses
+                </a>
+              </li>
+              <li className="nxl-item">
+                <a style={{ color: 'white' }} className="nxl-link" href="#" onClick={() => setIsOpen(false)}>
+                   <span className="nxl-micon"><i className="feather-cast"></i></span>
+                  Rapport
                 </a>
               </li>
 
-              <li className="nxl-item">
-                <a style={{color:'blue'}} className="nxl-link" href="#" onClick={() => setIsOpen(false)}>
-                  Payments
-                </a>
-              </li>
+            
             </ul>
           </div>
         </div>
