@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import Navbar from "./Navbar";
-import Footer from "./Footer";
+import Header from "./Header";
 
 export default function Dashboard() {
   useEffect(() => {
@@ -107,89 +107,59 @@ export default function Dashboard() {
         <div className="nxl-content">
 
           {/* Page header */}
-          <div className="page-header">
-            <div className="page-header-left d-flex align-items-center">
-              <div className="page-header-title">
-                <h5 className="m-b-10">Reports</h5>
-              </div>
-              <ul className="breadcrumb">
-                <li className="breadcrumb-item"><a href="index.html">Home</a></li>
-                <li className="breadcrumb-item">Sales</li>
-              </ul>
-            </div>
-            <div className="page-header-right ms-auto">
-              <div className="page-header-right-items">
-                <div className="d-flex d-md-none">
-                  <a href="javascript:void(0)" className="page-header-right-close-toggle">
-                    <i className="feather-arrow-left me-2"></i><span>Back</span>
-                  </a>
-                </div>
-                <div className="d-flex align-items-center gap-2 page-header-right-items-wrapper">
-                  <div className="dropdown filter-dropdown">
-                    <a className="btn btn-light-brand" data-bs-toggle="dropdown" data-bs-offset="0, 10" data-bs-auto-close="outside">
-                      <i className="feather-filter me-2"></i><span>Filter</span>
-                    </a>
-                    <div className="dropdown-menu dropdown-menu-end">
-                      {['Role','Team','Email','Member','Recommendation'].map(item => (
-                        <div className="dropdown-item" key={item}>
-                          <div className="custom-control custom-checkbox">
-                            <input type="checkbox" className="custom-control-input" id={item} defaultChecked />
-                            <label className="custom-control-label c-pointer" htmlFor={item}>{item}</label>
-                          </div>
-                        </div>
-                      ))}
-                      <div className="dropdown-divider"></div>
-                      <a href="javascript:void(0);" className="dropdown-item"><i className="feather-plus me-3"></i><span>Create New</span></a>
-                      <a href="javascript:void(0);" className="dropdown-item"><i className="feather-filter me-3"></i><span>Manage Filter</span></a>
-                    </div>
-                  </div>
-                  <a href="javascript:void(0);" className="btn btn-primary">
-                    <i className="feather-plus me-2"></i><span>Add Widgets</span>
-                  </a>
-                </div>
-              </div>
-              <div className="d-md-none d-flex align-items-center">
-                <a href="javascript:void(0)" className="page-header-right-open-toggle">
-                  <i className="feather-align-right fs-20"></i>
-                </a>
-              </div>
-            </div>
-          </div>
+          <Header/>
 
           {/* Content */}
           <div className="main-content">
             <div className="row">
 
-              {/* ── KPI Cards ── */}
-              {[
-                { icon:'feather-dollar-sign',  label:'Active Deals',   value:'5,658',  prev:'4,563',  badge:'+ 23.65%', color:'success' },
-                { icon:'feather-pie-chart',    label:'Revenue Deals',  value:'89,657', prev:'76,852', badge:'- 06.32%', color:'danger'  },
-                { icon:'feather-plus-square',  label:'Deals Created',  value:'2,354',  prev:'1,578',  badge:'+ 30.47%', color:'success' },
-                { icon:'feather-sunset',       label:'Deals Closing',  value:'2,422',  prev:'2,847',  badge:'- 08.55%', color:'danger'  },
-              ].map(({ icon, label, value, prev, badge, color }) => (
-                <div className="col-xxl-3 col-md-6" key={label}>
-                  <div className="card stretch stretch-full">
-                    <div className="card-body">
-                      <div className="hstack justify-content-between">
-                        <div>
-                          <div className="hstack gap-2 mb-4">
-                            <i className={icon}></i><span>{label}</span>
-                          </div>
-                          <h4 className="fw-bolder mb-3">$<span className="counter">{value}</span> USD</h4>
-                          <p className="fs-12 text-muted mb-0">vs last month: <span className="fw-semibold text-dark">${prev} USD</span></p>
+              <div className="col-xxl-3 col-md-6" >
+                        <div className="card bg-soft-primary border-soft-primary text-primary overflow-hidden">
+                            <div className="card-body "  style={{backgroundColor:'green',color:'white'}}>
+                                <i className="feather-dollar-sign fs-20"></i>
+                                <h5 className="fs-4 text-reset mt-4 mb-1" >210 000 CFA</h5>
+                                <div className="fs-12 text-reset fw-normal">Session en cours...</div>
+                            </div>
                         </div>
-                        <a href="javascript:void(0);" className={`badge bg-soft-${color} text-${color}`}>{badge}</a>
-                      </div>
                     </div>
-                  </div>
-                </div>
-              ))}
+                    <div className="col-xxl-3 col-md-6">
+                        <div className="card bg-soft-success border-soft-success text-success overflow-hidden">
+                            <div className="card-body" style={{backgroundColor:'blue',color:'white'}}>
+                               <i className="feather-dollar-sign fs-20"></i>
+                                <h5 className="fs-4 text-reset mt-4 mb-1">110 000 CFA</h5>
+                                <div className="fs-12 text-reset fw-normal">Total des dépenses</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-xxl-3 col-md-6">
+                        <div className="card bg-soft-warning border-soft-warning text-warning overflow-hidden">
+                            <div className="card-body" style={{backgroundColor:'#F54927',color:'white'}}>
+                                <i className="feather-shopping-cart fs-20"></i>
+                                <h5 className="fs-4 text-reset mt-4 mb-1">140 000 CFA</h5>
+                                <div className="fs-12 text-reset fw-normal">Montant restant après les dépenses</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-xxl-3 col-md-6">
+                        <div className="card bg-soft-danger border-soft-danger text-danger overflow-hidden">
+                            <div className="card-body" style={{backgroundColor:'#27F550',color:'black'}}>
+                                <i className="feather-dollar-sign fs-20"></i>
+                                <h5 className="fs-4 text-reset mt-4 mb-1">420 000 CFA</h5>
+                                <div className="fs-12 text-reset fw-normal">Total Encaissé ce mois </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+            
+             
 
               {/* ── Sales Pipeline (Bar Charts) ── */}
               <div className="col-xxl-8">
                 <div className="card stretch stretch-full">
                   <div className="card-header">
-                    <h5 className="card-title">Sales Pipeline</h5>
+                    <h5 className="card-title">Rapport des ventes</h5>
                     <div className="card-header-action">
                       <div className="card-header-btn">
                         <div data-bs-toggle="tooltip" title="Delete">
@@ -217,22 +187,7 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div className="card-body custom-card-action">
-                    <ul className="nav mb-4 gap-4 sales-pipeline-tabs" role="tablist">
-                      {[
-                        { target:'leadsTab',    label:'Leads',    amount:'$47,569', deals:'57 Deals', active:true  },
-                        { target:'proposalTab', label:'Proposal', amount:'$35,258', deals:'46 Deals', active:false },
-                        { target:'contractTab', label:'Contract', amount:'$24,569', deals:'34 Deals', active:false },
-                        { target:'projectTab',  label:'Project',  amount:'$53,853', deals:'42 Deals', active:false },
-                      ].map(({ target, label, amount, deals, active }) => (
-                        <li className="nav-item" role="presentation" key={target}>
-                          <a href="javascript:void(0);" className={`nav-link text-start${active?' active':''}`} data-bs-toggle="tab" data-bs-target={`#${target}`} role="tab">
-                            <span className="fw-semibold text-dark d-block">{label}</span>
-                            <span className="amount fs-18 fw-bold my-1 d-block">{amount}</span>
-                            <span className="deals fs-12 text-muted d-block">{deals}</span>
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
+                   
                     <div className="tab-content">
                       <div className="tab-pane fade show active" id="leadsTab"    role="tabpanel"><div id="leads-bar-chart"></div></div>
                       <div className="tab-pane fade"            id="proposalTab" role="tabpanel"><div id="proposal-bar-chart"></div></div>
@@ -327,46 +282,13 @@ export default function Dashboard() {
               </div>
 
               {/* ── Active Deals Progress ── */}
-              <div className="col-lg-12">
-                <div className="card stretch stretch-full">
-                  <div className="card-header">
-                    <h5 className="card-title">Active Deals Progress</h5>
-                  </div>
-                  <div className="card-body">
-                    <div className="row g-4">
-                      {[
-                        { num:1, date:'22 March, 2023', name:'Alexandra Della',  avatar:'1' },
-                        { num:2, date:'23 March, 2023', name:'Green Cute',       avatar:'2' },
-                        { num:3, date:'24 March, 2023', name:'Holmes Cherryman', avatar:'3' },
-                        { num:4, date:'25 March, 2023', name:'Malanie Hanvey',   avatar:'4' },
-                      ].map(({ num, date, name, avatar }) => (
-                        <div className="col-xxl-3 col-lg-6" key={num}>
-                          <div className="border border-dashed border-gray-5 p-4 rounded-3 gap-4 text-center">
-                            <div className={`sales-progress-${num}`}></div>
-                            <div className="mt-4">
-                              <p className="fs-12 text-muted mb-1">Closing date: <span className="fs-11 fw-medium text-dark">{date}</span></p>
-                              <a href="javascript:void(0);" className="fw-bold text-truncate-1-line">Web development deal with alex</a>
-                              <div className="hstack gap-3 mt-3 justify-content-center">
-                                <div className="avatar-image avatar-sm">
-                                  <img src={`src/assets/images/avatar/${avatar}.png`} alt="" className="img-fluid" />
-                                </div>
-                                <a href="javascript:void(0);">{name}</a>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              
 
             </div>
           </div>
         </div>
 
-        {/* Footer */}
-       <Footer/>
+       
       </main>
 
       {/* ===== SEARCH MODAL ===== */}

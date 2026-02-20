@@ -1,28 +1,24 @@
-"use client";
-
 import { useState, useEffect } from "react";
+import { NavLink } from "react-router-dom";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
-  // Fermer le menu si on redimensionne vers desktop
+  const toggleMenu = (menu: string) => {
+    setActiveMenu(activeMenu === menu ? null : menu);
+  };
+
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768) {
-        setIsOpen(false);
-      }
+      if (window.innerWidth >= 768) setIsOpen(false);
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Empêcher le scroll du body quand le menu est ouvert sur mobile
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    document.body.style.overflow = isOpen ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
@@ -30,14 +26,13 @@ export default function Navbar() {
 
   return (
     <>
-      {/* ── Barre supérieure mobile (visible seulement < md) ── */}
+      {/* MOBILE TOPBAR — visible uniquement sur mobile */}
       <div className="mobile-topbar">
-        <h5 className="mobile-logo" style={{ color: 'white', textAlign: "center" }}>Lucky Business</h5>
+        <h5 className="mobile-logo">Lucky Business</h5>
         <button
           className={`hamburger ${isOpen ? "open" : ""}`}
           onClick={() => setIsOpen(!isOpen)}
-          aria-label="Toggle navigation"
-          aria-expanded={isOpen}
+          aria-label="Ouvrir le menu"
         >
           <span />
           <span />
@@ -45,94 +40,93 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* ── Overlay (mobile) ── */}
-      {isOpen && (
-        <div
-          className="overlay"
-          onClick={() => setIsOpen(false)}
-          aria-hidden="true"
-        />
-      )}
+      {/* Overlay */}
+      {isOpen && <div className="overlay" onClick={() => setIsOpen(false)} />}
 
-      {/* ── Sidebar ── */}
-      <nav className={`nxl-navigation ${isOpen ? "mobile-open" : ""}`} style={{ backgroundColor: 'black' }} >
-        <div className="navbar-wrapper">
-          <div className="m-header p-3" style={{ backgroundColor: 'black' }}>
-            <h5 style={{ color: 'white' }}>Lucky Business</h5>
-            {/* Bouton fermer (mobile) */}
-            <button
-              className="close-btn"
-              onClick={() => setIsOpen(false)}
-              aria-label="Fermer"
-            >
-              ✕
-            </button>
+      {/* SIDEBAR */}
+      <nav className={`nxl-navigation ${isOpen ? "mobile-open" : ""}`} >
+        <div className="navbar-wrapper" style={{marginLeft:'0'}}>
+          <div className="m-header">
+            <h5>Lucky Business</h5>
+            <button className="close-btn" onClick={() => setIsOpen(false)}>✕</button>
           </div>
 
           <div className="navbar-content">
-            <ul className="nxl-navbar" >
+            <ul className="nxl-navbar">
 
+              {/* DASHBOARD */}
+              <li className="nxl-item nxl-hasmenu" >
+                <NavLink to="/" className="nxl-link"  style={{color:'white'}}>
+                  <span className="nxl-micon" style={{color:'white'}}><i className="feather-airplay" /></span>
+                  Dashboards
+                  <span className="arrow"></span>
+                </NavLink>
+              
+              </li>
 
-              <li className="nxl-item nxl-hasmenu" style={{ color: 'white' }}>
-                <a href="javascript:void(0);" className="nxl-link">
-                  <span className="nxl-micon"><i className="feather-airplay"></i></span>
-                  <span className="nxl-mtext" style={{ color: 'white' }}>Dashboards</span><span className="nxl-arrow"><i className="feather-chevron-right"></i></span>
+              {/* SESSION */}
+              <li className="nxl-item nxl-hasmenu">
+                <a href="#" className="nxl-link" onClick={(e) => { e.preventDefault(); toggleMenu("session"); }} style={{color:'white'}}>
+                  <span className="nxl-micon"><i className="feather-send" /></span>
+                  Session
+                  <span className="arrow">{activeMenu === "session" ? "▲" : "▼"}</span>
                 </a>
-                <ul className="nxl-submenu">
-                  <li className="nxl-item" ><a style={{ color: 'white' }} className="nxl-link" href="index.html">CRM</a></li>
-                  <li className="nxl-item" ><a style={{ color: 'white' }} className="nxl-link" href="analytics.html">Analytics</a></li>
+                <ul className={`nxl-submenu ${activeMenu === "session" ? "open" : ""}`}>
+                  <li>
+                    <NavLink to="/session" onClick={() => setIsOpen(false)}>
+                      Créer une session
+                    </NavLink>
+                  </li>
+                  <li><a href="#">Toutes les sessions</a></li>
                 </ul>
               </li>
 
-              <li className="nxl-item">
-
-                <a href="javascript:void(0);" className="nxl-link">
-                  <span className="nxl-micon">  <i className="feather-send"></i></span>
-                  <span className="nxl-mtext" style={{ color: 'white' }}>Session</span><span className="nxl-arrow"><i className="feather-chevron-right"></i></span>
-                </a>
-                <ul className="nxl-submenu">
-                  <li className="nxl-item" ><a style={{ color: 'white' }} className="nxl-link" href="index.html">En cours</a></li>
-                  <li className="nxl-item" ><a style={{ color: 'white' }} className="nxl-link" href="analytics.html">Toutes les sessions</a></li>
-                </ul>
-              </li>
-              <li className="nxl-item">
-
-                <a style={{ color: 'white' }} className="nxl-link" href="#" onClick={() => setIsOpen(false)}>
-                  <span className="nxl-micon"><i className="feather-users"></i></span>
-                  Gestion des utilisateurs
+              {/* AUTRES */}
+              <li>
+                <a href="#" className="nxl-link" onClick={() => setIsOpen(false)} style={{color:'white'}}>
+                  <span className="nxl-micon"><i className="feather-users" /></span>
+                  Gestion utilisateurs
                 </a>
               </li>
-              <li className="nxl-item">
-                <a style={{ color: 'white' }} className="nxl-link" href="#" onClick={() => setIsOpen(false)}>
-                   <span className="nxl-micon"><i className="feather-dollar-sign"></i></span>
+
+              <li>
+                <a href="#" className="nxl-link" style={{color:'white'}}>
+                  <span className="nxl-micon"><i className="feather-users" /></span>
+                  Partenaires
+                </a>
+              </li>
+
+              <li >
+                <a href="#" className="nxl-link" style={{color:'white'}}>
+                  <span className="nxl-micon"><i className="feather-dollar-sign" /></span>
                   Dépenses
                 </a>
               </li>
-              <li className="nxl-item">
-                <a style={{ color: 'white' }} className="nxl-link" href="#" onClick={() => setIsOpen(false)}>
-                   <span className="nxl-micon"><i className="feather-cast"></i></span>
+
+              <li>
+                <NavLink to='/rapport' className="nxl-link" style={{color:'white'}}>
+                  <span className="nxl-micon"><i className="feather-cast" /></span>
                   Rapport
-                </a>
+                </NavLink>
               </li>
 
-            
             </ul>
           </div>
         </div>
       </nav>
 
       <style>{`
-        /* ── Variables ── */
         :root {
           --sidebar-width: 260px;
-          --topbar-height: 56px;
-          --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           --bg: #1e1e2d;
-          --text: #e0e0f0;
-          --accent: #6c63ff;
+          --transition: .3s;
         }
 
-        /* ── Sidebar (desktop : toujours visible) ── */
+        /* ===== DESKTOP ===== */
+        .mobile-topbar {
+          display: none;
+        }
+
         .nxl-navigation {
           position: fixed;
           top: 0;
@@ -140,50 +134,27 @@ export default function Navbar() {
           width: var(--sidebar-width);
           height: 100vh;
           background: var(--bg);
-          color: var(--text);
           overflow-y: auto;
           z-index: 200;
           transition: transform var(--transition);
-          /* Sur desktop, forcer la sidebar à être toujours visible */
-          transform: translateX(0) !important;
-        }
-
-        .navbar-wrapper {
-          display: flex;
-          flex-direction: column;
-          height: 100%;
         }
 
         .m-header {
           display: flex;
-          align-items: center;
           justify-content: space-between;
-          padding: 1rem;
-          border-bottom: 1px solid rgba(255,255,255,0.08);
+          align-items: center;
+          padding: 16px 18px;
+          color: #fff;
+          border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
-        .m-header h5 {
-          margin: 0;
-          font-size: 1.1rem;
-          font-weight: 700;
-          color: var(--text);
-        }
-
-        /* Bouton ✕ (mobile seulement) */
         .close-btn {
-          display: none;
           background: none;
           border: none;
-          color: var(--text);
-          font-size: 1.2rem;
+          color: #fff;
+          font-size: 18px;
           cursor: pointer;
-          padding: 4px 8px;
-        }
-
-        .navbar-content {
-          overflow-y: auto;
-          flex: 1;
-          padding: 0.5rem 0;
+          display: none;
         }
 
         .nxl-navbar {
@@ -192,121 +163,131 @@ export default function Navbar() {
           margin: 0;
         }
 
-        .nxl-caption label {
-          font-size: 0.7rem;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-          color: rgba(255,255,255,0.35);
-          padding: 0.75rem 1rem 0.25rem;
-          display: block;
-        }
-
         .nxl-link {
-          display: block;
-          padding: 0.65rem 1.25rem;
-          color: rgba(255,255,255,0.75);
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 12px 18px;
+          color: white;
           text-decoration: none;
-          border-radius: 6px;
-          margin: 2px 8px;
-          transition: background var(--transition), color var(--transition);
-          font-size: 0.92rem;
+          transition: .2s;
+          cursor: pointer;
         }
 
         .nxl-link:hover {
-          background: rgba(108,99,255,0.18);
+          background: rgba(108,99,255,0.2);
+        }
+
+        .arrow {
+          margin-left: auto;
+          font-size: 11px;
+          opacity: 0.6;
+        }
+
+        /* Sous-menus */
+        .nxl-submenu {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          max-height: 0;
+          overflow: hidden;
+          transition: max-height var(--transition) ease;
+          background: rgba(255,255,255,0.04);
+        }
+
+        .nxl-submenu.open {
+          max-height: 300px;
+        }
+
+        .nxl-submenu a {
+          padding: 10px 18px 10px 46px;
+          display: block;
+          color: #ccc;
+          text-decoration: none;
+          transition: .2s;
+        }
+
+        .nxl-submenu a:hover {
           color: #fff;
         }
 
-        /* ── Topbar mobile (cachée sur desktop) ── */
-        .mobile-topbar {
-          display: none;
-        }
-
-        /* ── Overlay ── */
-        .overlay {
-          display: none;
-        }
-
-        /* ── Hamburger ── */
-        .hamburger {
-          background: none;
-          border: none;
-          cursor: pointer;
-          display: flex;
-          flex-direction: column;
-          gap: 5px;
-          padding: 4px;
-        }
-
-        .hamburger span {
-          display: block;
-          width: 24px;
-          height: 2px;
-          background: #fff;
-          border-radius: 2px;
-          transition: transform var(--transition), opacity var(--transition);
-          transform-origin: center;
-        }
-
-        .hamburger.open span:nth-child(1) {
-          transform: translateY(7px) rotate(45deg);
-        }
-        .hamburger.open span:nth-child(2) {
-          opacity: 0;
-        }
-        .hamburger.open span:nth-child(3) {
-          transform: translateY(-7px) rotate(-45deg);
-        }
-
-        /* ── Responsive ── */
+        /* ===== MOBILE ===== */
         @media (max-width: 767px) {
-          /* Sidebar cachée par défaut, apparaît en slide */
-          /* On override le !important du desktop */
-          .nxl-navigation {
-            transform: translateX(-100%) !important;
-            z-index: 300;
-          }
 
-          .nxl-navigation.mobile-open {
-            transform: translateX(0) !important;
-          }
-
-          /* Afficher le bouton ✕ dans le header de la sidebar */
-          .close-btn {
-            display: block;
-          }
-
-          /* Topbar mobile visible */
+          /* Topbar visible sur mobile */
           .mobile-topbar {
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
+            background: var(--bg);
+            color: #fff;
+            padding: 12px 16px;
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            height: var(--topbar-height);
-            background: var(--bg);
-            color: var(--text);
-            padding: 0 1rem;
-            z-index: 100;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            z-index: 300;
           }
 
           .mobile-logo {
             margin: 0;
-            font-size: 1rem;
-            font-weight: 700;
+            font-size: 16px;
           }
 
-          /* Overlay semi-transparent */
-          .overlay {
+          /* Hamburger */
+          .hamburger {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 4px;
+          }
+
+          .hamburger span {
             display: block;
+            width: 24px;
+            height: 2px;
+            background: #fff;
+            transition: var(--transition);
+            transform-origin: center;
+          }
+
+          .hamburger.open span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+          }
+
+          .hamburger.open span:nth-child(2) {
+            opacity: 0;
+          }
+
+          .hamburger.open span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+          }
+
+          /* Sidebar cachée par défaut sur mobile */
+          .nxl-navigation {
+            transform: translateX(-100%);
+            z-index: 250;
+          }
+
+          /* Sidebar ouverte */
+          .nxl-navigation.mobile-open {
+            transform: translateX(0);
+          }
+
+          /* Bouton fermeture visible sur mobile */
+          .close-btn {
+            display: block;
+          }
+
+          /* Overlay */
+          .overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.55);
-            z-index: 200;
-            backdrop-filter: blur(2px);
+            background: rgba(0,0,0,0.55);
+            z-index: 240;
           }
         }
       `}</style>
