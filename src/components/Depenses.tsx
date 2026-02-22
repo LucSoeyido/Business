@@ -2,48 +2,25 @@ import Navbar from "./Navbar";
 import React, { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import {
-    fetchRapports,
-    createRapport,
-    deleteRapport,
-} from "../redux/slices/rapportSlice";
-import { useAppDispatch, useAppSelector } from "../redux/hooks";
 
-
-export default function Rapport() {
-    const dispatch = useAppDispatch();
-    const { rapports, loading } = useAppSelector((state) => state.rapport);
-
+export default function Depenses() {
 
     interface FormContr {
         libelle: string,
-        created_at: Date | null,
-        montant: number | null,
-        session_id: number
-
+        dateDemarrage: Date,
+        montant: number | null
 
     }
 
     const [formData, setFormData] = useState<FormContr>({
         libelle: '',
-        created_at: new Date(),
-        montant: null,
-        session_id: 1
+        dateDemarrage: new Date(),
+        montant: null
 
     })
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-        dispatch(
-            createRapport(formData)
-        );
-        setFormData({
-            libelle: '',
-            created_at: null,
-            montant: null,
-            session_id: 1
-
-        })
+        console.log('Données sauvégardées:', formData)
 
     }
 
@@ -66,40 +43,26 @@ export default function Rapport() {
                                 <div className="card shadow w-100">
                                     <div className="card-body p-3 p-md-5">
 
-                                        <h2 className="mb-4 text-center">Créer un nouveau rapport</h2>
+                                        <h2 className="mb-4 text-center">Créer un nouvelle dépense</h2>
 
                                         <form onSubmit={handleSubmit}>
 
                                             {/* Libellé */}
                                             <div className="mb-3">
 
-                                                <select
-                                                    value={formData.libelle}
+                                                <input
 
                                                     className="form-control"
+                                                    placeholder="Libellé de la dépense"
 
                                                     onChange={(e) =>
                                                         setFormData({ ...formData, libelle: e.target.value })
                                                     }
                                                     required
-                                                >
-                                                    <option value="" disabled selected>Choisir un partenaire</option>
-                                                    <option value="Basile">Basile</option>
-                                                    <option value="Mawulinon">Mawulinon</option>
-                                                    <option value="Martina">Martina</option>
-                                                    <option value="Léa">Léa</option>
-                                                    <option value="Téla David">Téla David</option>
-                                                    <option value="Doky">Doky</option>
-                                                    <option value="Base">Base</option>
-                                                    <option value="Eugène">Eugène</option>
-                                                    <option value="Démarcheur">Démarcheur</option>
-                                                    <option value="Maman Doky">Maman Doky</option>
-                                                    <option value="Adélin">Adélin</option>
-                                                    <option value="Tassi justine">Tassi justine</option>
-                                                    <option value="josephine">josephine</option>
-                                                    <option value="Autres">Autres</option>
+                                                />
+                                                  
 
-                                                </select>
+                                               
 
                                             </div>
 
@@ -107,12 +70,12 @@ export default function Rapport() {
                                                 {/* Date démarrage */}
                                                 <div className="col-12 col-md-12 mb-3">
                                                     <label className="form-label" style={{ padding: '10px' }}>
-                                                        Date du rapport
+                                                        Date de la  dépense
                                                     </label>
                                                     <DatePicker
-                                                        selected={formData.created_at}
+                                                        selected={formData.dateDemarrage}
                                                         onChange={(date) =>
-                                                            setFormData({ ...formData, created_at: date })
+                                                            setFormData({ ...formData, dateDemarrage: date })
                                                         }
                                                         className="form-control"
                                                         dateFormat="dd/MM/yyyy"
@@ -122,27 +85,24 @@ export default function Rapport() {
                                                 {/* Date clôture */}
                                                 <div className="col-12 col-md-12 mb-3">
                                                     <label className="form-label" style={{ padding: '10px' }}>
-                                                        Montant
+                                                        Montant de la dépense
                                                     </label>
                                                     <input
                                                         type="number"
-                                                        value={formData.montant ?? ""}
+                                                        value={formData.montant}
 
                                                         onChange={(e) =>
                                                             setFormData({ ...formData, montant: parseFloat(e.target.value) })
-                                                        }
+                                                         }
                                                         className="form-control"
 
                                                     />
                                                 </div>
                                             </div>
 
-                                            <button type="submit" className="btn btn-primary w-100 mt-3">
-
-                                                {loading ? <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> : 'Sauvegarder'}
-
+                                            <button className="btn btn-primary w-100 mt-3">
+                                                Enregistrer
                                             </button>
-
 
                                         </form>
                                     </div>

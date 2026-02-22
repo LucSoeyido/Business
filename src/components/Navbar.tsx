@@ -45,7 +45,7 @@ export default function Navbar() {
 
       {/* SIDEBAR */}
       <nav className={`nxl-navigation ${isOpen ? "mobile-open" : ""}`} >
-        <div className="navbar-wrapper" style={{marginLeft:'0'}}>
+        <div className="navbar-wrapper" style={{ marginLeft: '0' }}>
           <div className="m-header">
             <h5>Lucky Business</h5>
             <button className="close-btn" onClick={() => setIsOpen(false)}>✕</button>
@@ -56,17 +56,17 @@ export default function Navbar() {
 
               {/* DASHBOARD */}
               <li className="nxl-item nxl-hasmenu" >
-                <NavLink to="/" className="nxl-link"  style={{color:'white'}}>
-                  <span className="nxl-micon" style={{color:'white'}}><i className="feather-airplay" /></span>
+                <NavLink to="/" className="nxl-link" style={{ color: 'white' }}>
+                  <span className="nxl-micon" style={{ color: 'white' }}><i className="feather-airplay" /></span>
                   Dashboards
                   <span className="arrow"></span>
                 </NavLink>
-              
+
               </li>
 
               {/* SESSION */}
               <li className="nxl-item nxl-hasmenu">
-                <a href="#" className="nxl-link" onClick={(e) => { e.preventDefault(); toggleMenu("session"); }} style={{color:'white'}}>
+                <a href="#" className="nxl-link" onClick={(e) => { e.preventDefault(); toggleMenu("session"); }} style={{ color: 'white' }}>
                   <span className="nxl-micon"><i className="feather-send" /></span>
                   Session
                   <span className="arrow">{activeMenu === "session" ? "▲" : "▼"}</span>
@@ -83,32 +83,42 @@ export default function Navbar() {
 
               {/* AUTRES */}
               <li>
-                <a href="#" className="nxl-link" onClick={() => setIsOpen(false)} style={{color:'white'}}>
+                <a href="#" className="nxl-link" onClick={() => setIsOpen(false)} style={{ color: 'white' }}>
                   <span className="nxl-micon"><i className="feather-users" /></span>
                   Gestion utilisateurs
                 </a>
               </li>
 
               <li>
-                <a href="#" className="nxl-link" style={{color:'white'}}>
+                <a href="#" className="nxl-link" style={{ color: 'white' }}>
                   <span className="nxl-micon"><i className="feather-users" /></span>
                   Partenaires
                 </a>
               </li>
 
               <li >
-                <a href="#" className="nxl-link" style={{color:'white'}}>
+                <NavLink to="/depenses" className="nxl-link" style={{ color: 'white' }}>
                   <span className="nxl-micon"><i className="feather-dollar-sign" /></span>
                   Dépenses
-                </a>
-              </li>
-
-              <li>
-                <NavLink to='/rapport' className="nxl-link" style={{color:'white'}}>
-                  <span className="nxl-micon"><i className="feather-cast" /></span>
-                  Rapport
                 </NavLink>
               </li>
+              <li className="nxl-item nxl-hasmenu">
+                <a href="#" className="nxl-link" onClick={(e) => { e.preventDefault(); toggleMenu("rapport"); }} style={{ color: 'white' }}>
+                  <span className="nxl-micon"><i className="feather-cast" /></span>
+                  Rapport
+                  <span className="arrow">{activeMenu === "rapport" ? "▲" : "▼"}</span>
+                </a>
+                <ul className={`nxl-submenu ${activeMenu === "rapport" ? "open" : ""}`}>
+                  <li>
+                    <NavLink to="/rapport" onClick={() => setIsOpen(false)}>
+                      Créer un nouveau rapport
+                    </NavLink>
+                  </li>
+                  <li><NavLink to="/list_rapport">Tous les rapports</NavLink></li>
+                </ul>
+              </li>
+
+
 
             </ul>
           </div>
@@ -158,20 +168,22 @@ export default function Navbar() {
         }
 
         .nxl-navbar {
-          list-style: none;
-          padding: 0;
-          margin: 0;
+        list-style: none;
+  padding: 0 !important; /* Force la suppression du décalage par défaut */
+  margin: 0;
+  width: 100%;
         }
 
         .nxl-link {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          padding: 12px 18px;
-          color: white;
-          text-decoration: none;
-          transition: .2s;
-          cursor: pointer;
+       display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 15px; /* Réduit un peu le padding latéral si nécessaire */
+  color: white;
+  text-decoration: none;
+  transition: .2s;
+  cursor: pointer;
+  width: 100%;
         }
 
         .nxl-link:hover {
@@ -206,6 +218,12 @@ export default function Navbar() {
           text-decoration: none;
           transition: .2s;
         }
+
+        .nxl-item {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
 
         .nxl-submenu a:hover {
           color: #fff;
@@ -282,6 +300,8 @@ export default function Navbar() {
             display: block;
           }
 
+          
+
           /* Overlay */
           .overlay {
             position: fixed;
@@ -289,6 +309,62 @@ export default function Navbar() {
             background: rgba(0,0,0,0.55);
             z-index: 240;
           }
+            
+        }
+          /* REINITIALISATION FORCEE */
+        .nxl-navbar, 
+        .nxl-navbar ul {
+          list-style: none !important;
+          padding: 0 !important;
+          margin: 0 !important;
+          display: block !important; /* On force le bloc pour éviter les comportements flex parents */
+          width: 100% !important;
+        }
+
+        .nxl-item, 
+        .nxl-navbar li {
+          display: block !important;
+          width: 100% !important;
+          padding: 0 !important;
+          margin: 0 !important;
+          text-align: left !important;
+        }
+
+        .nxl-link {
+          display: flex !important; /* On garde flex uniquement pour l'alignement icône/texte */
+          align-items: center;
+          justify-content: flex-start !important; /* Force le début de ligne */
+          gap: 12px;
+          padding: 12px 20px !important; /* Ajustez le 20px pour l'éloignement du bord gauche */
+          color: white;
+          text-decoration: none;
+          width: 100%;
+          box-sizing: border-box; /* Important pour que le padding ne dépasse pas */
+        }
+
+        .nxl-micon {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 20px; /* On fixe la largeur de l'icône pour que les textes soient alignés */
+          margin: 0 !important;
+        }
+
+        /* SOUS-MENUS */
+        .nxl-submenu {
+          display: none; /* Caché par défaut */
+        }
+
+        .nxl-submenu.open {
+          display: block !important;
+          max-height: none !important; /* Évite les bugs de transition pour le test */
+        }
+
+        .nxl-submenu a {
+          padding: 10px 20px 10px 52px !important; /* Décalage vers la droite pour la hiérarchie */
+          display: block;
+          color: #ccc;
+          text-decoration: none;
         }
       `}</style>
     </>
