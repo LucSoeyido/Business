@@ -1,425 +1,253 @@
-import React, { useEffect } from "react";
 import Navbar from "./Navbar";
 import Header from "./Header";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { FiDollarSign, FiTrendingUp, FiTrendingDown, FiCalendar, FiActivity } from "react-icons/fi";
+import { MutatingDots } from 'react-loader-spinner';
+
+// Importation des composants de Recharts
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
+interface ChartData {
+  name: string;
+  entrees: number;
+}
+
+interface DashboardStats {
+  session_active: string;
+  total_session: number;
+  total_depenses: number;
+  montant_net_session: number;
+  total_mois: number;
+  chart_data: ChartData[];
+  annees_disponibles: number[];
+  annee_selectionnee: number;
+   // 👈 Ajout des données du graphique
+}
 
 export default function Dashboard() {
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+
   useEffect(() => {
-    if (typeof window.ApexCharts === 'undefined') return;
-
-    const commonBarOptions = {
-      chart: { type: 'bar', height: 300, toolbar: { show: false } },
-      plotOptions: { bar: { borderRadius: 4, columnWidth: '50%' } },
-      dataLabels: { enabled: false },
-      colors: ['#4f46e5'],
-      xaxis: {
-        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-      },
+    const fetchStats = async () => {
+      try {
+        const response = await axios.get(`http://127.0.0.1:8000/api/dashboard-stats?year=${selectedYear}`);
+        setStats(response.data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des statistiques", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    // ---- Sales Pipeline Bar Charts ----
-    const barCharts = [
-      { id: '#leads-bar-chart',    data: [30, 40, 35, 50, 49, 60, 70, 91, 125, 80, 60, 45] },
-      { id: '#proposal-bar-chart', data: [20, 35, 40, 45, 55, 65, 60, 75, 100, 70, 50, 35] },
-      { id: '#contract-bar-chart', data: [15, 25, 30, 35, 45, 55, 50, 65,  90, 60, 40, 25] },
-      { id: '#project-bar-chart',  data: [25, 38, 42, 48, 52, 68, 72, 88, 115, 75, 55, 40] },
-    ];
-    const barInstances = barCharts.map(({ id, data }) => {
-      const el = document.querySelector(id);
-      if (!el) return null;
-      const chart = new window.ApexCharts(el, {
-        ...commonBarOptions,
-        series: [{ name: 'Deals', data }],
-      });
-      chart.render();
-      return chart;
-    });
+    fetchStats();
+  },[selectedYear]);
 
-    // ---- Revenue Overview – Line Chart ----
-    let revenueChart = null;
-    const revenueEl = document.querySelector('#revenue-line-chart');
-    if (revenueEl) {
-      revenueChart = new window.ApexCharts(revenueEl, {
-        chart: { type: 'line', height: 300, toolbar: { show: false }, zoom: { enabled: false } },
-        series: [
-          { name: 'Revenue',  data: [31, 40, 28, 51, 42, 109, 100, 80, 95,  70, 88, 120] },
-          { name: 'Expenses', data: [11, 32, 45, 32, 34,  52,  41, 60, 44,  55, 40,  70] },
-        ],
-        stroke: { curve: 'smooth', width: 2 },
-        colors: ['#4f46e5', '#f97316'],
-        xaxis: { categories: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'] },
-        legend: { position: 'top' },
-        dataLabels: { enabled: false },
-      });
-      revenueChart.render();
+  // Personnalisation de l'info-bulle du graphique au survol
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="custom-tooltip shadow-lg" style={{ backgroundColor: '#fff', padding: '15px', borderRadius: '12px', border: 'none' }}>
+          <p className="fw-bold mb-1" style={{ color: '#2b3674' }}>{label}</p>
+          <p className="text-primary fw-bolder mb-0" style={{ fontSize: '16px' }}>
+            {payload[0].value.toLocaleString()} FCFA
+          </p>
+        </div>
+      );
     }
-
-    // ---- Deals by Status – Donut Chart ----
-    let dealsChart = null;
-    const dealsEl = document.querySelector('#deals-donut-chart');
-    if (dealsEl) {
-      dealsChart = new window.ApexCharts(dealsEl, {
-        chart: { type: 'donut', height: 280 },
-        series: [44, 55, 13, 43],
-        labels: ['Won', 'Lost', 'Pending', 'In Progress'],
-        colors: ['#22c55e', '#ef4444', '#f97316', '#4f46e5'],
-        legend: { position: 'bottom' },
-        plotOptions: { pie: { donut: { size: '65%' } } },
-        dataLabels: { enabled: true },
-      });
-      dealsChart.render();
-    }
-
-    // ---- Customers Growth – Area Chart ----
-    let customersChart = null;
-    const customersEl = document.querySelector('#customers-area-chart');
-    if (customersEl) {
-      customersChart = new window.ApexCharts(customersEl, {
-        chart: { type: 'area', height: 260, toolbar: { show: false } },
-        series: [{ name: 'New Customers', data: [10, 41, 35, 51, 49, 62, 69, 91, 148, 100, 75, 120] }],
-        xaxis: { categories: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'] },
-        colors: ['#4f46e5'],
-        fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05 } },
-        stroke: { curve: 'smooth', width: 2 },
-        dataLabels: { enabled: false },
-      });
-      customersChart.render();
-    }
-
-    return () => {
-      barInstances.forEach(c => c && c.destroy());
-      revenueChart   && revenueChart.destroy();
-      dealsChart     && dealsChart.destroy();
-      customersChart && customersChart.destroy();
-    };
-  }, []);
+    return null;
+  };
+  // Formateur pour raccourcir les grands nombres sur l'axe Y
+  const formatYAxis = (value: number) => {
+    if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
+    if (value >= 1000) return `${(value / 1000).toFixed(0)}k`;
+    return value.toString();
+  };
 
   return (
     <>
-      {/* ===== NAVIGATION ===== */}
-       <Navbar/>
+      <Navbar />
 
-      {/* ===== HEADER ===== */}
-      
-     
+      <main className="main-wrapper" style={{ backgroundColor: '#f4f7fe' }}>
+        <div className="main-content py-3 px-3 px-md-4">
+          <Header />
 
-      {/* ===== MAIN ===== */}
-      <main className="nxl-container" style={{backgroundColor:'black',top: '0'}}>
-        <div className="nxl-content">
-
-          {/* Page header */}
-          <Header/>
-
-          {/* Content */}
-          <div className="main-content">
-            <div className="row">
-
-              <div className="col-xxl-3 col-md-6" >
-                        <div className="card bg-soft-primary border-soft-primary text-primary overflow-hidden">
-                            <div className="card-body "  style={{backgroundColor:'green',color:'white'}}>
-                                <i className="feather-dollar-sign fs-20"></i>
-                                <h5 className="fs-4 text-reset mt-4 mb-1" >210 000 CFA</h5>
-                                <div className="fs-12 text-reset fw-normal">Session en cours...</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="col-xxl-3 col-md-6">
-                        <div className="card bg-soft-success border-soft-success text-success overflow-hidden">
-                            <div className="card-body" style={{backgroundColor:'blue',color:'white'}}>
-                               <i className="feather-dollar-sign fs-20"></i>
-                                <h5 className="fs-4 text-reset mt-4 mb-1">110 000 CFA</h5>
-                                <div className="fs-12 text-reset fw-normal">Total des dépenses</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="col-xxl-3 col-md-6">
-                        <div className="card bg-soft-warning border-soft-warning text-warning overflow-hidden">
-                            <div className="card-body" style={{backgroundColor:'#F54927',color:'white'}}>
-                                <i className="feather-shopping-cart fs-20"></i>
-                                <h5 className="fs-4 text-reset mt-4 mb-1">140 000 CFA</h5>
-                                <div className="fs-12 text-reset fw-normal">Montant restant après les dépenses</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="col-xxl-3 col-md-6">
-                        <div className="card bg-soft-danger border-soft-danger text-danger overflow-hidden">
-                            <div className="card-body" style={{backgroundColor:'#27F550',color:'black'}}>
-                                <i className="feather-dollar-sign fs-20"></i>
-                                <h5 className="fs-4 text-reset mt-4 mb-1">420 000 CFA</h5>
-                                <div className="fs-12 text-reset fw-normal">Total Encaissé ce mois </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-
-            
-             
-
-              {/* ── Sales Pipeline (Bar Charts) ── */}
-              <div className="col-xxl-8">
-                <div className="card stretch stretch-full">
-                  <div className="card-header">
-                    <h5 className="card-title">Rapport des ventes</h5>
-                    <div className="card-header-action">
-                      <div className="card-header-btn">
-                        <div data-bs-toggle="tooltip" title="Delete">
-                          <a href="javascript:void(0);" className="avatar-text avatar-xs bg-danger" data-bs-toggle="remove"> </a>
-                        </div>
-                        <div data-bs-toggle="tooltip" title="Refresh">
-                          <a href="javascript:void(0);" className="avatar-text avatar-xs bg-warning" data-bs-toggle="refresh"> </a>
-                        </div>
-                        <div data-bs-toggle="tooltip" title="Maximize/Minimize">
-                          <a href="javascript:void(0);" className="avatar-text avatar-xs bg-success" data-bs-toggle="expand"> </a>
-                        </div>
-                      </div>
-                      <div className="dropdown">
-                        <a href="javascript:void(0);" className="avatar-text avatar-sm" data-bs-toggle="dropdown" data-bs-offset="25, 25">
-                          <i className="feather-more-vertical"></i>
-                        </a>
-                        <div className="dropdown-menu dropdown-menu-end">
-                          <a href="javascript:void(0);" className="dropdown-item"><i className="feather-at-sign"></i>New</a>
-                          <a href="javascript:void(0);" className="dropdown-item"><i className="feather-calendar"></i>Event</a>
-                          <a href="javascript:void(0);" className="dropdown-item"><i className="feather-trash-2"></i>Deleted</a>
-                          <div className="dropdown-divider"></div>
-                          <a href="javascript:void(0);" className="dropdown-item"><i className="feather-settings"></i>Settings</a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="card-body custom-card-action">
-                   
-                    <div className="tab-content">
-                      <div className="tab-pane fade show active" id="leadsTab"    role="tabpanel"><div id="leads-bar-chart"></div></div>
-                      <div className="tab-pane fade"            id="proposalTab" role="tabpanel"><div id="proposal-bar-chart"></div></div>
-                      <div className="tab-pane fade"            id="contractTab" role="tabpanel"><div id="contract-bar-chart"></div></div>
-                      <div className="tab-pane fade"            id="projectTab"  role="tabpanel"><div id="project-bar-chart"></div></div>
-                    </div>
-                  </div>
-                  <div className="card-footer d-md-flex flex-wrap p-4 pt-5 border-top border-gray-5">
-                    {[
-                      { label:'Current',    amount:'$65,658 USD', color:'primary' },
-                      { label:'Overdue',    amount:'$34,541 USD', color:'danger'  },
-                      { label:'Additional', amount:'$20,478 USD', color:'success' },
-                    ].map(({ label, amount, color }, i) => (
-                      <React.Fragment key={label}>
-                        {i > 0 && <div className="vr mx-4 text-gray-600 d-none d-md-flex"></div>}
-                        <div className="flex-fill mb-4 mb-md-0 pb-2 pb-md-0">
-                          <p className={`fs-11 fw-semibold text-uppercase text-${color} mb-2`}>{label}</p>
-                          <h2 className="fs-20 fw-bold mb-0">{amount}</h2>
-                        </div>
-                      </React.Fragment>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* ── NEW: Deals by Status – Donut Chart ── */}
-              <div className="col-xxl-4">
-                <div className="card stretch stretch-full">
-                  <div className="card-header">
-                    <h5 className="card-title">Deals by Status</h5>
-                  </div>
-                  <div className="card-body">
-                    <div id="deals-donut-chart"></div>
-                    <div className="row g-2 mt-3">
-                      {[
-                        { label:'Won',         color:'success' },
-                        { label:'Lost',        color:'danger'  },
-                        { label:'Pending',     color:'warning' },
-                        { label:'In Progress', color:'primary' },
-                      ].map(({ label, color }) => (
-                        <div className="col-6" key={label}>
-                          <div className={`d-flex align-items-center gap-2 p-2 rounded bg-soft-${color}`}>
-                            <i className={`feather-circle text-${color} fs-10`}></i>
-                            <span className="fs-12 fw-semibold">{label}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* ── NEW: Revenue Overview – Line Chart ── */}
-              <div className="col-xxl-8">
-                <div className="card stretch stretch-full">
-                  <div className="card-header">
-                    <h5 className="card-title">Revenue Overview</h5>
-                    <div className="card-header-action">
-                      <div className="dropdown">
-                        <a href="javascript:void(0);" className="btn btn-sm btn-light-brand" data-bs-toggle="dropdown">This Year</a>
-                        <div className="dropdown-menu dropdown-menu-end">
-                          <a href="javascript:void(0);" className="dropdown-item">This Year</a>
-                          <a href="javascript:void(0);" className="dropdown-item">Last Year</a>
-                          <a href="javascript:void(0);" className="dropdown-item">Last 6 Months</a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="card-body">
-                    <div id="revenue-line-chart"></div>
-                  </div>
-                </div>
-              </div>
-
-              {/* ── NEW: Customers Growth – Area Chart ── */}
-              <div className="col-xxl-4">
-                <div className="card stretch stretch-full">
-                  <div className="card-header">
-                    <h5 className="card-title">Customers Growth</h5>
-                  </div>
-                  <div className="card-body">
-                    <div id="customers-area-chart"></div>
-                    <div className="d-flex align-items-center justify-content-between mt-3 pt-3 border-top">
-                      <div>
-                        <p className="fs-12 text-muted mb-1">Total New Customers</p>
-                        <h4 className="fw-bolder mb-0">+1,248</h4>
-                      </div>
-                      <a href="javascript:void(0);" className="badge bg-soft-success text-success">+ 18.4%</a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* ── Active Deals Progress ── */}
-              
-
+          <div className="mb-4 d-flex align-items-center">
+            <div className="icon-box bg-white text-primary shadow-sm me-3" style={{ width: '50px', height: '50px', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <FiActivity size={24} />
+            </div>
+            <div>
+              <h2 className="fw-bolder mb-0" style={{ color: '#2b3674' }}>Vue d'ensemble</h2>
+              <p className="text-muted mb-0">
+                Session en cours : <strong className="text-primary">{stats?.session_active || 'Chargement...'}</strong>
+              </p>
             </div>
           </div>
-        </div>
 
-       
+          {loading ? (
+            <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+              <MutatingDots height="80" width="80" color="#4318FF" visible={true} />
+            </div>
+          ) : stats ? (
+            <>
+              {/* Les 4 cartes de statistiques */}
+              {/* Les 4 cartes de statistiques : 2 par ligne (col-md-6) */}
+              <div className="row g-4 mb-4">
+
+                <div className="col-12 col-md-6">
+                  <div className="card border-0 shadow-sm h-100" style={{ borderRadius: '20px' }}>
+                    <div className="card-body p-4 d-flex align-items-center">
+                      <div className="icon-box bg-success bg-opacity-10 text-success rounded-circle d-flex justify-content-center align-items-center me-3" style={{ width: '60px', height: '60px' }}>
+                        <FiTrendingUp size={28} />
+                      </div>
+                      <div>
+                        <p className="text-muted mb-1 fw-bold" style={{ fontSize: '12px', textTransform: 'uppercase' }}>Entrées (Session)</p>
+                        <h4 className="fw-bolder mb-0" style={{ color: '#2b3674' }}>
+                          {stats.total_session.toLocaleString()} <span className="fs-6 text-muted">FCFA</span>
+                        </h4>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-12 col-md-6">
+                  <div className="card border-0 shadow-sm h-100" style={{ borderRadius: '20px' }}>
+                    <div className="card-body p-4 d-flex align-items-center">
+                      <div className="icon-box bg-danger bg-opacity-10 text-danger rounded-circle d-flex justify-content-center align-items-center me-3" style={{ width: '60px', height: '60px' }}>
+                        <FiTrendingDown size={28} />
+                      </div>
+                      <div>
+                        <p className="text-muted mb-1 fw-bold" style={{ fontSize: '12px', textTransform: 'uppercase' }}>Dépenses (Session)</p>
+                        <h4 className="fw-bolder mb-0" style={{ color: '#2b3674' }}>
+                          {stats.total_depenses.toLocaleString()} <span className="fs-6 text-muted">FCFA</span>
+                        </h4>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-12 col-md-6">
+                  <div className="card border-0 shadow-sm h-100" style={{ borderRadius: '20px' }}>
+                    <div className="card-body p-4 d-flex align-items-center">
+                      <div className="icon-box bg-primary bg-opacity-10 text-primary rounded-circle d-flex justify-content-center align-items-center me-3" style={{ width: '60px', height: '60px' }}>
+                        <FiDollarSign size={28} />
+                      </div>
+                      <div>
+                        <p className="text-muted mb-1 fw-bold" style={{ fontSize: '12px', textTransform: 'uppercase' }}>Net (Session)</p>
+                        <h4 className={`fw-bolder mb-0 ${stats.montant_net_session >= 0 ? 'text-success' : 'text-danger'}`}>
+                          {stats.montant_net_session > 0 ? '+' : ''}{stats.montant_net_session.toLocaleString()} <span className="fs-6 text-muted">FCFA</span>
+                        </h4>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-12 col-md-6">
+                  <div className="card border-0 shadow-sm h-100" style={{ borderRadius: '20px' }}>
+                    <div className="card-body p-4 d-flex align-items-center">
+                      <div className="icon-box bg-warning bg-opacity-10 text-warning rounded-circle d-flex justify-content-center align-items-center me-3" style={{ width: '60px', height: '60px' }}>
+                        <FiCalendar size={28} />
+                      </div>
+                      <div>
+                        <p className="text-muted mb-1 fw-bold" style={{ fontSize: '12px', textTransform: 'uppercase' }}>Total Encaissé (Mois)</p>
+                        <h4 className="fw-bolder mb-0" style={{ color: '#2b3674' }}>
+                          {stats.total_mois.toLocaleString()} <span className="fs-6 text-muted">FCFA</span>
+                        </h4>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* ===== SECTION GRAPHIQUE ===== */}
+              <div className="card border-0 shadow-sm w-100" style={{ borderRadius: '20px' }}>
+                <div className="card-body p-4 p-md-5">
+                 {/* En-tête du graphique avec le Select */}
+                                    <div className="d-flex justify-content-between align-items-center mb-4">
+                                        <h4 className="fw-bolder m-0" style={{ color: '#2b3674' }}>Évolution des entrées</h4>
+                                        
+                                        {/* Le Select stylisé qui remplace l'ancien badge statique */}
+                                        <select 
+                                            className="form-select border-0 text-primary fw-bold shadow-sm" 
+                                            style={{ 
+                                                width: 'auto', 
+                                                backgroundColor: '#f4f7fe', 
+                                                borderRadius: '12px', 
+                                                cursor: 'pointer',
+                                                padding: '8px 36px 8px 16px' // Ajustement du padding
+                                            }}
+                                            value={selectedYear}
+                                            onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                                        >
+                                            {stats.annees_disponibles?.map((annee) => (
+                                                <option key={annee} value={annee}>
+                                                    Année {annee}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                  <div style={{ width: '100%', height: 350 }}>
+                    <ResponsiveContainer>
+                      {/* Correction de la marge gauche (left: 10 au lieu de -20) */}
+                      <LineChart data={stats.chart_data} margin={{ top: 10, right: 20, left: 10, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e9ecef" />
+                        <XAxis
+                          dataKey="name"
+                          axisLine={false}
+                          tickLine={false}
+                          tick={{ fill: '#a0aec0', fontSize: 13, fontWeight: 600 }}
+                          dy={10}
+                        />
+                        <YAxis
+                          axisLine={false}
+                          tickLine={false}
+                          tick={{ fill: '#a0aec0', fontSize: 13 }}
+                          tickFormatter={formatYAxis} /* 👈 Application du formateur */
+                          width={50} /* 👈 On donne assez d'espace pour le texte */
+                        />
+                        <Tooltip content={<CustomTooltip />} cursor={{ fill: 'transparent', stroke: '#e9ecef', strokeWidth: 2, strokeDasharray: '5 5' }} />
+                        <Line
+                          type="monotone"
+                          dataKey="entrees"
+                          stroke="#4318FF"
+                          strokeWidth={4}
+                          dot={{ fill: '#4318FF', stroke: '#fff', strokeWidth: 3, r: 6 }}
+                          activeDot={{ r: 8, strokeWidth: 0, fill: '#4318FF' }}
+                          animationDuration={1500}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="alert alert-danger shadow-sm border-0" style={{ borderRadius: '15px' }}>
+              Impossible de charger les statistiques.
+            </div>
+          )}
+
+        </div>
       </main>
 
-      {/* ===== SEARCH MODAL ===== */}
-      <div className="modal fade-scale" id="searchModal" aria-hidden="true" tabIndex="-1">
-        <div className="modal-dialog modal-lg modal-dialog-top modal-dialog-scrollable">
-          <div className="modal-content">
-            <div className="modal-header search-form py-0">
-              <div className="input-group">
-                <span className="input-group-text"><i className="feather-search fs-4 text-muted"></i></span>
-                <input type="text" className="form-control search-input-field" placeholder="Search..." />
-                <span className="input-group-text">
-                  <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </span>
-              </div>
-            </div>
-            <div className="modal-body">
-              <div className="searching-for mb-5">
-                <h4 className="fs-13 fw-normal text-gray-600 mb-3">I&apos;m searching for...</h4>
-                <div className="row g-1">
-                  {['Recent','Command','Peoples','Files','Medias','More'].map(item => (
-                    <div className="col-md-4 col-xl-2" key={item}>
-                      <a href="javascript:void(0);" className="d-flex align-items-center gap-2 px-3 lh-lg border rounded-pill">
-                        <span>{item}</span>
-                      </a>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ===== LANGUAGE MODAL ===== */}
-      <div className="modal fade-scale" id="languageSelectModal" aria-hidden="true" aria-labelledby="languageSelectModalLabel" tabIndex="-1">
-        <div className="modal-dialog modal-lg modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title" id="languageSelectModalLabel">Select Language</h5>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div className="modal-body">
-              <div className="row">
-                {[['sa','Arabic'],['bd','Bengali'],['ch','Chinese'],['hr','Croatian'],['dk','Danish'],['nl','Dutch'],
-                  ['us','English'],['fi','Filipino'],['fr','French'],['de','German'],['il','Hebrew'],['in','Hindi'],
-                  ['id','Indonesian'],['it','Italian'],['jp','Japanese'],['kr','Korean'],['ir','Persian'],['pt','Portuguese'],
-                  ['ru','Russian'],['es','Spanish'],['sv','Swedish'],['tr','Turkish'],['pk','Urdu'],['vi','Vietnamese'],
-                ].map(([flag, label]) => (
-                  <div key={flag} className={`col-6 col-md-4 col-lg-3 language_select${flag==='us'?' active':''}`}>
-                    <a href="javascript:void(0);" className="d-flex align-items-center gap-2">
-                      <div className="avatar-image avatar-sm">
-                        <img src={`src/assets/vendors/img/flags/1x1/${flag}.svg`} alt={label} className="img-fluid" />
-                      </div>
-                      <span>{label}</span>
-                    </a>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ===== TOAST ===== */}
-      <div className="position-fixed" style={{ right: '5px', bottom: '5px', zIndex: 999999 }}>
-        <div id="toast" className="toast bg-black hide" data-bs-delay="3000" role="alert" aria-live="assertive" aria-atomic="true">
-          <div className="toast-header px-3 bg-transparent d-flex align-items-center justify-content-between border-bottom border-light border-opacity-10">
-            <div className="text-white mb-0">Downloading...</div>
-            <a href="javascript:void(0)" className="ms-2 mb-1 close fw-normal" data-bs-dismiss="toast" aria-label="Close">
-              <span className="text-white">&times;</span>
-            </a>
-          </div>
-          <div className="toast-body p-3 text-white">
-            <h6 className="fs-13 text-white">Project.zip</h6>
-            <span className="text-light fs-11">4.2mb of 5.5mb</span>
-          </div>
-          <div className="toast-footer p-3 pt-0 border-top border-light border-opacity-10">
-            <div className="progress mt-3" style={{ height: '5px' }}>
-              <div className="progress-bar progress-bar-striped progress-bar-animated w-75 bg-dark"
-                role="progressbar" aria-valuenow={75} aria-valuemin={0} aria-valuemax={100}></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ===== THEME CUSTOMIZER ===== */}
-      <div className="theme-customizer">
-        <div className="customizer-handle">
-          <a href="javascript:void(0);" className="cutomizer-open-trigger bg-primary">
-            <i className="feather-settings"></i>
-          </a>
-        </div>
-        <div className="customizer-sidebar-wrapper">
-          <div className="customizer-sidebar-header px-4 ht-80 border-bottom d-flex align-items-center justify-content-between">
-            <h5 className="mb-0">Theme Settings</h5>
-            <a href="javascript:void(0);" className="cutomizer-close-trigger d-flex"><i className="feather-x"></i></a>
-          </div>
-          <div className="customizer-sidebar-body position-relative p-4" data-scrollbar-target="#psScrollbarInit">
-
-            {[
-              { id:'appNavigationList', name:'app-navigation', title:'Navigation' },
-              { id:'appHeaderList',     name:'app-header',     title:'Header'     },
-              { id:'appSkinList',       name:'app-skin',       title:'Skins'      },
-            ].map(({ id, name, title }) => (
-              <div className="position-relative px-3 pb-3 pt-4 mt-3 mb-5 border border-gray-2 theme-options-set" key={title}>
-                <label className="py-1 px-2 fs-8 fw-bold text-uppercase text-muted text-spacing-2 bg-white border border-gray-2 position-absolute rounded-2 options-label" style={{ top: '-12px' }}>{title}</label>
-                <div className={`row g-2 theme-options-items ${name.replace('app-','app-')}`} id={id}>
-                  {['Light','Dark'].map((v, i) => {
-                    const inputId = `${name}-${v.toLowerCase()}`;
-                    return (
-                      <div className="col-6 text-center single-option" key={v}>
-                        <input type="radio" className="btn-check" id={inputId} name={name} value={String(i+1)} defaultChecked={i===0} />
-                        <label className="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" htmlFor={inputId}>{v}</label>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-
-          </div>
-          <div className="customizer-sidebar-footer px-4 ht-60 border-top d-flex align-items-center gap-2">
-            <div className="flex-fill w-50">
-              <a href="javascript:void(0);" className="btn btn-danger" data-style="reset-all-common-style">Reset</a>
-            </div>
-            <div className="flex-fill w-50">
-              <a href="https://www.themewagon.com/themes/Duralux-admin" target="_blank" rel="noreferrer" className="btn btn-primary">Download</a>
-            </div>
-          </div>
-        </div>
-      </div>
+      <style>{`
+                .main-wrapper {
+                    margin-left: 280px; 
+                    min-height: 100vh;
+                    transition: margin-left 0.3s ease;
+                }
+                
+                @media (max-width: 1023px) {
+                    .main-wrapper {
+                        margin-left: 0;
+                        padding-top: 70px; 
+                    }
+                }
+            `}</style>
     </>
   );
 }
