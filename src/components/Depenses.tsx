@@ -4,11 +4,13 @@ import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import { useNavigate } from 'react-router-dom';
 import 'react-datepicker/dist/react-datepicker.css';
-import { useAppDispatch } from "../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import axios from 'axios';
+
 
 // Ajout des icônes pour le design Soft UI
 import { FiCalendar, FiCheck, FiDollarSign, FiEdit3, FiLayers } from "react-icons/fi";
+import { createDepense } from "../redux/slices/depenseSlice";
 
 // J'ajoute "montant" car c'est une dépense, n'hésite pas à ajuster si ton backend est différent !
 interface FormState {
@@ -27,7 +29,7 @@ export default function Depenses() {
         created_at: new Date(),
     });
 
-    const [loading, setLoading] = useState(false);
+   const { loading } = useAppSelector((state) => state.depense);
     const [activeSession, setActiveSession] = useState<{ id: number; libelle: string } | null>(null);
 
      useEffect(() => {
@@ -50,16 +52,20 @@ export default function Depenses() {
     }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-        console.log('Données de dépense soumises :', formData);
-        
-        // Simulation d'une requête API (à remplacer par ton action Redux ou Axios)
-        setTimeout(() => {
-            setLoading(false);
-            // navigate('/list_depenses');
-        }, 1000);
-    };
+          e.preventDefault();
+          try {
+              await dispatch(createDepense(formData)).unwrap();
+              setFormData({
+                  libelle: '',
+                  created_at: null,
+                  montant: null,
+                  
+              });
+              navigate('/list_depense');
+          } catch (error) {
+              console.error("L'ajout a échoué :", error);
+          }
+      };
 
     return (
         <>
@@ -71,6 +77,7 @@ export default function Depenses() {
                 <div className="main-content py-3 px-3 px-md-4">
                     
                     <Header />
+                    
 
                     <div className="row justify-content-center m-0">
                         <div className="col-12 col-xl-10 p-0">

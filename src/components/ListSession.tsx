@@ -73,7 +73,7 @@ export default function ListSession() {
                                 <input
                                     type="text"
                                     className="form-control border-0 ps-0 shadow-none bg-white"
-                                    placeholder="Rechercher un partenaire..."
+                                    placeholder="Rechercher une session..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
@@ -100,69 +100,65 @@ export default function ListSession() {
                                     <table className="table modern-table mb-0">
                                         <thead>
                                             <tr>
-
-                                                <th>Libellé</th>
-                                                <th>Montant Total</th>
-                                                <th>Statut</th>
-                                                <th>Date de démarrage</th>
-                                                <th>Date de clôture</th>
+                                                <th>Libellé Session</th>
+                                                <th>Entrées (Rapports)</th>
+                                                <th>Sorties (Dépenses)</th>
+                                                <th>Montant Net</th>
                                                 <th className="text-center">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {Array.isArray(sessions) && sessions.length > 0 ? (
-                                                sessions.map((r) => (
-                                                    <tr key={r.id} className="align-middle">
-                                                        <td className="fw-semibold text-main">
-                                                            <span className="badge bg-light text-dark px-3 py-2 rounded-pill">
-                                                                {r.libelle || 'N/A'}
-                                                            </span>
-                                                        </td>
+                                                sessions.map((session) => {
+                                                    // 💡 1. LE CALCUL DU MONTANT NET AU FRONTEND
+                                                    // On utilise || 0 pour éviter les erreurs si les valeurs sont nulles
+                                                    const totalRapports = session.total_montants || 0;
+                                                    const totalDepenses = session.total_depenses || 0;
+                                                    const montantNet = totalRapports - totalDepenses;
 
-                                                        <td className="text-success fw-bolder font-monospace">
-                                                            {r.created_at ? `${r.total_montants} CFA` : '-'}
-                                                        </td>
+                                                    return (
+                                                        <tr key={session.id} className="align-middle">
+                                                            {/* Libellé */}
+                                                            <td className="fw-bold text-main">{session.libelle}</td>
 
-                                                        <td>
-                                                            {r.statut ? (
+                                                            {/* Total Rapports (en bleu/primaire) */}
+                                                            <td className="text-primary fw-bolder font-monospace">
+                                                                {totalRapports.toLocaleString()} FCFA
+                                                            </td>
 
-                                                                <span className="badge bg-success rounded-pill px-3 py-2 text-white">
-                                                                    En cours
-                                                                </span>
-                                                            ) : (
+                                                            {/* Total Dépenses (en rouge) */}
+                                                            <td className="text-danger fw-bolder font-monospace">
+                                                                {totalDepenses.toLocaleString()} FCFA
+                                                            </td>
 
-                                                                <span className="badge bg-danger rounded-pill px-3 py-2 text-white">
-                                                                    Cloturé
-                                                                </span>
-                                                            )}
-                                                        </td>
+                                                            {/* 💡 2. AFFICHAGE DU MONTANT NET (Vert si positif, Rouge si négatif) */}
+                                                            <td className={`fw-bolder font-monospace ${montantNet >= 0 ? 'text-success' : 'text-danger'}`}>
+                                                                {montantNet > 0 ? '+' : ''}{montantNet.toLocaleString()} FCFA
+                                                            </td>
 
-                                                        <td className="text fw-bolder font-monospace ">
-                                                            {r.created_at ? `${r.created_at.toLocaleString()} ` : '-'}
-                                                        </td>
-
-                                                        <td className="text-muted">{r.date_cloture ? `${r.date_cloture}` : '-'}</td>
-                                                        <td className="text-center">
-                                                            <button
-                                                                className="btn btn-action btn-light-danger"
-                                                                title="Supprimer"
-                                                                onClick={() => {
-                                                                    setDeleteTaskId(r.id);
-                                                                    setDeleteTacheName(r.libelle);
-                                                                    setShowModalDelete(true);
-                                                                }}
-                                                            >
-                                                                <FiTrash2 />
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                ))
+                                                            {/* Actions */}
+                                                            <td className="text-center">
+                                                                <button
+                                                                    className="btn btn-action btn-light-danger"
+                                                                    title="Supprimer"
+                                                                    onClick={() => {
+                                                                        setDeleteTaskId(session.id);
+                                                                        setDeleteTacheName(session.libelle);
+                                                                        setShowModalDelete(true);
+                                                                    }}
+                                                                >
+                                                                    <FiTrash2 />
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })
                                             ) : (
                                                 <tr>
                                                     <td colSpan={5} className="text-center py-5 text-muted">
                                                         {searchTerm !== ''
-                                                            ? `Aucun session trouvée pour "${searchTerm}".`
-                                                            : "Aucun session trouvé."}
+                                                            ? `Aucune session trouvée pour "${searchTerm}".`
+                                                            : "Aucune session trouvée."}
                                                     </td>
                                                 </tr>
                                             )}

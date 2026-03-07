@@ -1,11 +1,9 @@
-export interface Session {
+export interface Depense {
   id: number;
   libelle: string;
+  montant: number | null;
   created_at: Date | null;
-  total_montants: number | null;
-  total_depenses: number | null;
-  statut: boolean ;
-  date_cloture: Date | null
+  session_id: number
 
 }
 
@@ -17,8 +15,8 @@ interface PaginationData {
   total: number;
 }
 
-export interface SessionState {
-  sessions: Session[];
+export interface DepenseState {
+  depenses: Depense[];
   pagination: PaginationData;
   loading: boolean;
   error: string | null;

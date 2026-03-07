@@ -7,6 +7,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { createSession } from "../redux/slices/sessionSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 
+
 // Ajout des icônes pour le design Soft UI
 import { FiCalendar, FiCheck, FiEdit3, FiLayers } from "react-icons/fi";
 
@@ -27,7 +28,7 @@ export default function Session() {
         date_cloture: null,
     });
 
-    const [loading, setLoading] = useState(false); // Ajout d'un state de chargement fictif pour le bouton
+    const { loading } = useAppSelector((state) => state.session); // Ajout d'un state de chargement fictif pour le bouton
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

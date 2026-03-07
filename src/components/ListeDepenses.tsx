@@ -1,5 +1,5 @@
 import Navbar from "./Navbar";
-import { fetchRapports, deleteRapport } from "../redux/slices/rapportSlice";
+import { fetchDepenses, deleteDepense } from "../redux/slices/depenseSlice";
 import { useEffect, useState, useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { MutatingDots } from 'react-loader-spinner';
@@ -8,7 +8,7 @@ import { NavLink } from "react-router-dom";
 // Ajout de FiSearch pour la barre de recherche
 import { FiTrash2, FiFileText, FiPlus, FiAlertCircle, FiSearch } from "react-icons/fi";
 
-export default function ListRapport() {
+export default function ListDepenses() {
     const dispatch = useAppDispatch();
 
     // États pour le modal
@@ -19,28 +19,28 @@ export default function ListRapport() {
     // États pour la recherche
     const [searchTerm, setSearchTerm] = useState('');
 
-    const { rapports, loading, pagination } = useAppSelector((state) => state.rapport);
+    const { depenses, loading, pagination } = useAppSelector((state) => state.depense);
 
     // Système de Debounce : déclenche la recherche avec un léger délai
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
             // On envoie la recherche en réinitialisant à la page 1
-            dispatch(fetchRapports({ page: 1, search: searchTerm }));
+            dispatch(fetchDepenses({ page: 1, search: searchTerm }));
         }, 500); // Délai de 500ms
 
         return () => clearTimeout(delayDebounceFn);
     }, [searchTerm, dispatch]);
 
     const handlePageChange = (pageNumber: number) => {
-        dispatch(fetchRapports({ page: pageNumber, search: searchTerm }));
+        dispatch(fetchDepenses({ page: pageNumber, search: searchTerm }));
     };
 
     const confirmDelete = async () => {
         if (deleteTaskId) {
-            await dispatch(deleteRapport(deleteTaskId));
+            await dispatch(deleteDepense(deleteTaskId));
             setShowModalDelete(false);
             // Recharger la liste actuelle après suppression
-            dispatch(fetchRapports({ page: pagination?.currentPage || 1, search: searchTerm }));
+            dispatch(fetchDepenses({ page: pagination?.currentPage || 1, search: searchTerm }));
         }
     };
 
@@ -59,8 +59,8 @@ export default function ListRapport() {
                                 <FiFileText size={24} />
                             </div>
                             <div>
-                                <h2 className="fw-bolder mb-0 text-main">Liste des Rapports</h2>
-                                <p className="text-muted mb-0 small">Gérez et consultez vos rapports enregistrés</p>
+                                <h2 className="fw-bolder mb-0 text-main">Liste des Dépenses</h2>
+                                <p className="text-muted mb-0 small">Gérez et consultez vos dépenses enregistrées</p>
                             </div>
                         </div>
                         
@@ -73,14 +73,14 @@ export default function ListRapport() {
                                 <input 
                                     type="text" 
                                     className="form-control border-0 ps-0 shadow-none bg-white" 
-                                    placeholder="Rechercher un rapport..." 
+                                    placeholder="Rechercher une dépense..." 
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                             </div>
 
                             {/* Bouton pour ajouter un nouveau rapport */}
-                            <NavLink to="/rapport" className="btn btn-primary d-flex align-items-center justify-content-center shadow-sm" style={{ borderRadius: '12px', padding: '10px 20px', whiteSpace: 'nowrap' }}>
+                            <NavLink to="/depenses" className="btn btn-primary d-flex align-items-center justify-content-center shadow-sm" style={{ borderRadius: '12px', padding: '10px 20px', whiteSpace: 'nowrap' }}>
                                 <FiPlus className="me-2" />
                                 Nouveau
                             </NavLink>
@@ -91,7 +91,7 @@ export default function ListRapport() {
                     <div className="card border-0 shadow-sm w-100" style={{ borderRadius: '20px' }}>
                         <div className="card-body p-0">
                             
-                            {loading && (!rapports || rapports.length === 0) ? (
+                            {loading && (!depenses || depenses.length === 0) ? (
                                 <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '300px' }}>
                                     <MutatingDots height="80" width="80" color="#4318FF" visible={true} />
                                 </div>
@@ -101,26 +101,27 @@ export default function ListRapport() {
                                         <thead>
                                             <tr>
                                                 <th>Session</th>
-                                                <th>Partenaire (Libellé)</th>
+                                                <th>Libellé</th>
                                                 <th>Montant</th>
                                                 <th>Date</th>
                                                 <th className="text-center">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {Array.isArray(rapports) && rapports.length > 0 ? (
-                                                rapports.map((r) => (
+                                            {Array.isArray(depenses) && depenses.length > 0 ? (
+                                                depenses.map((r) => (
                                                     <tr key={r.id} className="align-middle">
                                                         <td className="fw-semibold text-main">
                                                             <span className="badge bg-light text-dark px-3 py-2 rounded-pill">
                                                                 {r.session?.libelle || 'N/A'}
                                                             </span>
                                                         </td>
-                                                        <td className="fw-bold text-main">{r.libelle}</td>
+                                                        <td className="text-muted">{r.libelle? `${r.libelle}`:''}</td>
+                                                        
                                                         <td className="text-success fw-bolder font-monospace">
                                                             {r.montant ? `${r.montant.toLocaleString()} FCFA` : '-'}
                                                         </td>
-                                                        <td className="text-muted">{r.created_at}</td>
+                                                        <td className="text-muted">{r.created_at? `${r.created_at}`:''}</td>
                                                         <td className="text-center">
                                                             <button
                                                                 className="btn btn-action btn-light-danger"
@@ -140,8 +141,8 @@ export default function ListRapport() {
                                                 <tr>
                                                     <td colSpan={5} className="text-center py-5 text-muted">
                                                         {searchTerm !== '' 
-                                                            ? `Aucun rapport trouvé pour "${searchTerm}".` 
-                                                            : "Aucun rapport trouvé."}
+                                                            ? `Aucune dépense trouvé pour "${searchTerm}".` 
+                                                            : "Aucune dépense trouvé."}
                                                     </td>
                                                 </tr>
                                             )}
@@ -189,7 +190,7 @@ export default function ListRapport() {
                                     </div>
                                     <h4 className="fw-bolder text-main mb-3">Confirmer la suppression</h4>
                                     <p className="text-muted mb-4">
-                                        Voulez-vous vraiment supprimer le rapport du partenaire <strong className="text-dark">{deleteTacheName}</strong> ? Cette action est irréversible.
+                                        Voulez-vous vraiment supprimer la dépense<strong className="text-dark">{deleteTacheName}</strong> ? Cette action est irréversible.
                                     </p>
                                     <div className="d-flex justify-content-center gap-3">
                                         <button className="btn btn-light fw-bold px-4 py-2" style={{ borderRadius: '10px' }} onClick={() => setShowModalDelete(false)}>Annuler</button>
