@@ -9,6 +9,7 @@ import Depenses from './components/Depenses'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ListRapport from './components/ListRapport';
+import ListSession from './components/ListSession';
 
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
         <Route path='/rapport' element={<Rapport />}></Route>
         <Route path='/depenses' element={<Depenses />}></Route>
         <Route path='/list_rapport' element={<ListRapport />}></Route>
+        <Route path='/list_session' element={<ListSession />}></Route>
 
 
       </Routes>

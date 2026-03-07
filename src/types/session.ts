@@ -1,9 +1,10 @@
-export interface Rapport {
+export interface Session {
   id: number;
   libelle: string;
-  montant: number | null;
   created_at: Date | null;
-  session_id: number
+  total_montants: number | null;
+  statut: boolean ;
+  date_cloture: Date | null
 
 }
 
@@ -15,8 +16,8 @@ interface PaginationData {
   total: number;
 }
 
-export interface RapportState {
-  rapports: Rapport[];
+export interface SessionState {
+  sessions: Session[];
   pagination: PaginationData;
   loading: boolean;
   error: string | null;

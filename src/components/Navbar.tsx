@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
+import { FiGrid, FiSend, FiUsers, FiDollarSign, FiFileText, FiChevronDown, FiChevronUp, FiMenu, FiX } from "react-icons/fi";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,7 +12,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768) setIsOpen(false);
+      if (window.innerWidth >= 1024) setIsOpen(false);
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -26,345 +27,297 @@ export default function Navbar() {
 
   return (
     <>
-      {/* MOBILE TOPBAR — visible uniquement sur mobile */}
-      <div className="mobile-topbar">
-        <h5 className="mobile-logo">Lucky Business</h5>
+      {/* ===== MOBILE TOPBAR ===== */}
+      <div className="mobile-topbar shadow-sm">
+        <h5 className="mobile-logo fw-bolder mb-0">Lucky Business</h5>
         <button
-          className={`hamburger ${isOpen ? "open" : ""}`}
+          className="mobile-toggle-btn"
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Ouvrir le menu"
         >
-          <span />
-          <span />
-          <span />
+          {isOpen ? <FiX size={24} /> : <FiMenu size={24} />}
         </button>
       </div>
 
-      {/* Overlay */}
-      {isOpen && <div className="overlay" onClick={() => setIsOpen(false)} />}
+      {/* ===== OVERLAY (MOBILE) ===== */}
+      {isOpen && <div className="sidebar-overlay" onClick={() => setIsOpen(false)} />}
 
-      {/* SIDEBAR */}
-      <nav className={`nxl-navigation ${isOpen ? "mobile-open" : ""}`} >
-        <div className="navbar-wrapper" style={{ marginLeft: '0' }}>
-          <div className="m-header">
-            <h5>Lucky Business</h5>
-            <button className="close-btn" onClick={() => setIsOpen(false)}>✕</button>
-          </div>
-
-          <div className="navbar-content">
-            <ul className="nxl-navbar">
-
-              {/* DASHBOARD */}
-              <li className="nxl-item nxl-hasmenu" >
-                <NavLink to="/" className="nxl-link" style={{ color: 'white' }}>
-                  <span className="nxl-micon" style={{ color: 'white' }}><i className="feather-airplay" /></span>
-                  Dashboards
-                  <span className="arrow"></span>
-                </NavLink>
-
-              </li>
-
-              {/* SESSION */}
-              <li className="nxl-item nxl-hasmenu">
-                <a href="#" className="nxl-link" onClick={(e) => { e.preventDefault(); toggleMenu("session"); }} style={{ color: 'white' }}>
-                  <span className="nxl-micon"><i className="feather-send" /></span>
-                  Session
-                  <span className="arrow">{activeMenu === "session" ? "▲" : "▼"}</span>
-                </a>
-                <ul className={`nxl-submenu ${activeMenu === "session" ? "open" : ""}`}>
-                  <li>
-                    <NavLink to="/session" onClick={() => setIsOpen(false)}>
-                      Créer une session
-                    </NavLink>
-                  </li>
-                  <li><a href="#">Toutes les sessions</a></li>
-                </ul>
-              </li>
-
-              {/* AUTRES */}
-              <li>
-                <a href="#" className="nxl-link" onClick={() => setIsOpen(false)} style={{ color: 'white' }}>
-                  <span className="nxl-micon"><i className="feather-users" /></span>
-                  Gestion utilisateurs
-                </a>
-              </li>
-
-              <li>
-                <a href="#" className="nxl-link" style={{ color: 'white' }}>
-                  <span className="nxl-micon"><i className="feather-users" /></span>
-                  Partenaires
-                </a>
-              </li>
-
-              <li >
-                <NavLink to="/depenses" className="nxl-link" style={{ color: 'white' }}>
-                  <span className="nxl-micon"><i className="feather-dollar-sign" /></span>
-                  Dépenses
-                </NavLink>
-              </li>
-              <li className="nxl-item nxl-hasmenu">
-                <a href="#" className="nxl-link" onClick={(e) => { e.preventDefault(); toggleMenu("rapport"); }} style={{ color: 'white' }}>
-                  <span className="nxl-micon"><i className="feather-cast" /></span>
-                  Rapport
-                  <span className="arrow">{activeMenu === "rapport" ? "▲" : "▼"}</span>
-                </a>
-                <ul className={`nxl-submenu ${activeMenu === "rapport" ? "open" : ""}`}>
-                  <li>
-                    <NavLink to="/rapport" onClick={() => setIsOpen(false)}>
-                      Créer un nouveau rapport
-                    </NavLink>
-                  </li>
-                  <li><NavLink to="/list_rapport">Tous les rapports</NavLink></li>
-                </ul>
-              </li>
-
-
-
-            </ul>
-          </div>
+      {/* ===== SIDEBAR ===== */}
+      <aside className={`modern-sidebar shadow-sm ${isOpen ? "open" : ""}`}>
+        
+        {/* En-tête de la Sidebar */}
+        <div className="sidebar-header">
+          <h3 className="brand-title">Lucky Business</h3>
         </div>
-      </nav>
 
+        {/* Contenu de la navigation */}
+        <div className="sidebar-content">
+          <ul className="sidebar-nav">
+
+            {/* DASHBOARD */}
+            <li className="nav-item">
+              <NavLink to="/" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={() => setIsOpen(false)}>
+                <FiGrid className="nav-icon" />
+                <span>Dashboards</span>
+              </NavLink>
+            </li>
+
+            <div className="nav-divider">Gestion</div>
+
+            {/* SESSION */}
+            <li className="nav-item">
+              <button className={`nav-link ${activeMenu === "session" ? "expanded" : ""}`} onClick={() => toggleMenu("session")}>
+                <FiSend className="nav-icon" />
+                <span>Session</span>
+                {activeMenu === "session" ? <FiChevronUp className="nav-arrow" /> : <FiChevronDown className="nav-arrow" />}
+              </button>
+              <ul className={`nav-submenu ${activeMenu === "session" ? "open" : ""}`}>
+                <li><NavLink to="/session" onClick={() => setIsOpen(false)}>Créer une session</NavLink></li>
+                <li><NavLink to="/list_session" onClick={() => setIsOpen(false)}>Toutes les sessions</NavLink></li>
+              </ul>
+            </li>
+
+            {/* RAPPORTS */}
+            <li className="nav-item">
+              <button className={`nav-link ${activeMenu === "rapport" ? "expanded" : ""}`} onClick={() => toggleMenu("rapport")}>
+                <FiFileText className="nav-icon" />
+                <span>Rapports</span>
+                {activeMenu === "rapport" ? <FiChevronUp className="nav-arrow" /> : <FiChevronDown className="nav-arrow" />}
+              </button>
+              <ul className={`nav-submenu ${activeMenu === "rapport" ? "open" : ""}`}>
+                <li><NavLink to="/rapport" onClick={() => setIsOpen(false)}>Créer un rapport</NavLink></li>
+                <li><NavLink to="/list_rapport" onClick={() => setIsOpen(false)}>Tous les rapports</NavLink></li>
+              </ul>
+            </li>
+
+            <div className="nav-divider">Finances & Contacts</div>
+
+            {/* DÉPENSES */}
+            <li className="nav-item">
+              <NavLink to="/depenses" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={() => setIsOpen(false)}>
+                <FiDollarSign className="nav-icon" />
+                <span>Dépenses</span>
+              </NavLink>
+            </li>
+
+            {/* PARTENAIRES */}
+            <li className="nav-item">
+              <button className="nav-link">
+                <FiUsers className="nav-icon" />
+                <span>Partenaires</span>
+              </button>
+            </li>
+
+            {/* UTILISATEURS */}
+            <li className="nav-item">
+              <button className="nav-link">
+                <FiUsers className="nav-icon" />
+                <span>Utilisateurs</span>
+              </button>
+            </li>
+
+          </ul>
+        </div>
+      </aside>
+
+      {/* ===== STYLES CSS ===== */}
       <style>{`
         :root {
-          --sidebar-width: 260px;
-          --bg: #1e1e2d;
-          --transition: .3s;
+          --sidebar-width: 280px;
+          --sidebar-bg: #000000; /* Fond noir */
+          --text-main: #ffffff;  /* Texte principal en blanc pour le contraste */
+          --text-muted: #a0aec0; /* Texte secondaire en gris clair */
+          --primary-color: #4318FF; /* Couleur d'accentuation (bleu/violet) */
+          --hover-bg: #1a202c; /* Gris très foncé pour le survol */
+          --transition-speed: 0.3s;
         }
 
-        /* ===== DESKTOP ===== */
+        /* ===== MOBILE TOPBAR ===== */
         .mobile-topbar {
           display: none;
+          justify-content: space-between;
+          align-items: center;
+          background: var(--sidebar-bg);
+          padding: 15px 20px;
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          z-index: 1000;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .nxl-navigation {
+        .mobile-logo {
+          color: var(--text-main);
+          font-weight: 800;
+        }
+
+        .mobile-toggle-btn {
+          background: none;
+          border: none;
+          color: var(--text-main);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 5px;
+        }
+
+        /* ===== SIDEBAR DESKTOP ===== */
+        .modern-sidebar {
           position: fixed;
           top: 0;
           left: 0;
           width: var(--sidebar-width);
           height: 100vh;
-          background: var(--bg);
-          overflow-y: auto;
-          z-index: 200;
-          transition: transform var(--transition);
-        }
-
-        .m-header {
+          background: var(--sidebar-bg);
+          z-index: 1050;
           display: flex;
-          justify-content: space-between;
+          flex-direction: column;
+          transition: transform var(--transition-speed) ease;
+          border-right: 1px solid rgba(255, 255, 255, 0.05); /* Ligne subtile pour séparer du fond de page */
+        }
+
+        .sidebar-header {
+          padding: 30px 24px;
+          display: flex;
           align-items: center;
-          padding: 16px 18px;
-          color: #fff;
-          border-bottom: 1px solid rgba(255,255,255,0.1);
+          justify-content: center;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Ligne plus claire adaptée au fond noir */
         }
 
-        .close-btn {
-          background: none;
+        .brand-title {
+          font-size: 22px;
+          font-weight: 800;
+          color: var(--text-main);
+          margin: 0;
+          letter-spacing: -0.5px;
+        }
+
+        .sidebar-content {
+          flex: 1;
+          overflow-y: auto;
+          padding: 24px 16px;
+        }
+
+        .sidebar-nav {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        .nav-divider {
+          font-size: 12px;
+          font-weight: 700;
+          color: rgba(255, 255, 255, 0.4);
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          margin: 16px 0 8px 16px;
+        }
+
+        .nav-item {
+          display: flex;
+          flex-direction: column;
+        }
+
+        /* Liens et Boutons de navigation */
+        .nav-link {
+          display: flex;
+          align-items: center;
+          width: 100%;
+          padding: 12px 16px;
+          border-radius: 12px;
+          color: var(--text-muted);
+          text-decoration: none;
+          font-weight: 600;
+          font-size: 15px;
+          background: transparent;
           border: none;
-          color: #fff;
-          font-size: 18px;
           cursor: pointer;
-          display: none;
+          transition: all 0.2s ease;
+          text-align: left;
         }
 
-        .nxl-navbar {
-        list-style: none;
-  padding: 0 !important; /* Force la suppression du décalage par défaut */
-  margin: 0;
-  width: 100%;
+        .nav-link:hover, .nav-link.expanded {
+          background-color: var(--hover-bg);
+          color: #ffffff; /* Texte devient bien blanc au survol */
         }
 
-        .nxl-link {
-       display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 15px; /* Réduit un peu le padding latéral si nécessaire */
-  color: white;
-  text-decoration: none;
-  transition: .2s;
-  cursor: pointer;
-  width: 100%;
+        .nav-link.active {
+          background-color: var(--primary-color);
+          color: #ffffff;
+          box-shadow: 0 4px 15px rgba(67, 24, 255, 0.3);
         }
 
-        .nxl-link:hover {
-          background: rgba(108,99,255,0.2);
+        .nav-icon {
+          font-size: 20px;
+          margin-right: 14px;
+          min-width: 20px;
         }
 
-        .arrow {
+        .nav-arrow {
           margin-left: auto;
-          font-size: 11px;
-          opacity: 0.6;
+          font-size: 18px;
         }
 
         /* Sous-menus */
-        .nxl-submenu {
+        .nav-submenu {
           list-style: none;
           padding: 0;
           margin: 0;
           max-height: 0;
           overflow: hidden;
-          transition: max-height var(--transition) ease;
-          background: rgba(255,255,255,0.04);
+          transition: max-height var(--transition-speed) ease;
         }
 
-        .nxl-submenu.open {
-          max-height: 300px;
+        .nav-submenu.open {
+          max-height: 200px;
+          margin-top: 4px;
         }
 
-        .nxl-submenu a {
-          padding: 10px 18px 10px 46px;
+        .nav-submenu li a {
           display: block;
-          color: #ccc;
+          padding: 10px 16px 10px 50px;
+          color: var(--text-muted);
           text-decoration: none;
-          transition: .2s;
+          font-size: 14px;
+          font-weight: 500;
+          border-radius: 8px;
+          transition: all 0.2s ease;
         }
 
-        .nxl-item {
-  width: 100%;
-  padding: 0;
-  margin: 0;
-}
-
-        .nxl-submenu a:hover {
-          color: #fff;
+        .nav-submenu li a:hover, .nav-submenu li a.active {
+          color: var(--primary-color);
+          font-weight: 700;
         }
 
-        /* ===== MOBILE ===== */
-        @media (max-width: 767px) {
-
-          /* Topbar visible sur mobile */
+        /* ===== RESPONSIVE MOBILE ===== */
+        @media (max-width: 1023px) {
           .mobile-topbar {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--bg);
-            color: #fff;
-            padding: 12px 16px;
+          }
+
+          .modern-sidebar {
+            transform: translateX(-100%);
+          }
+
+          .modern-sidebar.open {
+            transform: translateX(0);
+          }
+
+          .sidebar-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            z-index: 300;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1040;
           }
-
-          .mobile-logo {
-            margin: 0;
-            font-size: 16px;
-          }
-
-          /* Hamburger */
-          .hamburger {
-            background: none;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            padding: 4px;
-          }
-
-          .hamburger span {
-            display: block;
-            width: 24px;
-            height: 2px;
-            background: #fff;
-            transition: var(--transition);
-            transform-origin: center;
-          }
-
-          .hamburger.open span:nth-child(1) {
-            transform: translateY(7px) rotate(45deg);
-          }
-
-          .hamburger.open span:nth-child(2) {
-            opacity: 0;
-          }
-
-          .hamburger.open span:nth-child(3) {
-            transform: translateY(-7px) rotate(-45deg);
-          }
-
-          /* Sidebar cachée par défaut sur mobile */
-          .nxl-navigation {
-            transform: translateX(-100%);
-            z-index: 250;
-          }
-
-          /* Sidebar ouverte */
-          .nxl-navigation.mobile-open {
-            transform: translateX(0);
-          }
-
-          /* Bouton fermeture visible sur mobile */
-          .close-btn {
-            display: block;
-          }
-
-          
-
-          /* Overlay */
-          .overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.55);
-            z-index: 240;
-          }
-            
-        }
-          /* REINITIALISATION FORCEE */
-        .nxl-navbar, 
-        .nxl-navbar ul {
-          list-style: none !important;
-          padding: 0 !important;
-          margin: 0 !important;
-          display: block !important; /* On force le bloc pour éviter les comportements flex parents */
-          width: 100% !important;
-        }
-
-        .nxl-item, 
-        .nxl-navbar li {
-          display: block !important;
-          width: 100% !important;
-          padding: 0 !important;
-          margin: 0 !important;
-          text-align: left !important;
-        }
-
-        .nxl-link {
-          display: flex !important; /* On garde flex uniquement pour l'alignement icône/texte */
-          align-items: center;
-          justify-content: flex-start !important; /* Force le début de ligne */
-          gap: 12px;
-          padding: 12px 20px !important; /* Ajustez le 20px pour l'éloignement du bord gauche */
-          color: white;
-          text-decoration: none;
-          width: 100%;
-          box-sizing: border-box; /* Important pour que le padding ne dépasse pas */
-        }
-
-        .nxl-micon {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          width: 20px; /* On fixe la largeur de l'icône pour que les textes soient alignés */
-          margin: 0 !important;
-        }
-
-        /* SOUS-MENUS */
-        .nxl-submenu {
-          display: none; /* Caché par défaut */
-        }
-
-        .nxl-submenu.open {
-          display: block !important;
-          max-height: none !important; /* Évite les bugs de transition pour le test */
-        }
-
-        .nxl-submenu a {
-          padding: 10px 20px 10px 52px !important; /* Décalage vers la droite pour la hiérarchie */
-          display: block;
-          color: #ccc;
-          text-decoration: none;
         }
       `}</style>
     </>

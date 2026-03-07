@@ -1,9 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import rapportReducer from "./slices/rapportSlice";
+import sessionReducer from "./slices/sessionSlice"
 
 export const store = configureStore({
   reducer: {
     rapport: rapportReducer,
+    session: sessionReducer,
   },
 });
 

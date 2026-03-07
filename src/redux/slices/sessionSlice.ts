@@ -1,22 +1,22 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import type { Rapport, RapportState } from "../../types/rapport"
+import type { Session, SessionState } from "../../types/session"
 import { toast } from 'react-toastify';
 
-const API_URL = "http://127.0.0.1:8000/api/all_rapport";
-const API_URL_CREATED = "http://127.0.0.1:8000/api/store_rapport";
-const API_URL_DELETE = "http://127.0.0.1:8000/api/delete_rapport";
+const API_URL = "http://127.0.0.1:8000/api/all_session";
+const API_URL_CREATED = "http://127.0.0.1:8000/api/store_session";
+const API_URL_DELETE = "http://127.0.0.1:8000/api/delete_session";
 
 interface LaravelPaginationResponse {
-  data: any[]; // Remplace any par ton type Rapport si tu en as un
+  data: any[]; // Remplace any par ton type session si tu en as un
   current_page: number;
   last_page: number;
   total: number;
   // ajoute d'autres champs si besoin (next_page_url, etc.)
 }
 
-const initialState: RapportState = {
-  rapports: [],
+const initialState: SessionState = {
+  sessions: [],
 
   pagination: {
     currentPage: 1,
@@ -27,12 +27,12 @@ const initialState: RapportState = {
   error: null,
 };
 
-// 🔹 GET tous les rapports (Mise à jour pour inclure la recherche)
-export const fetchRapports = createAsyncThunk<
+// 🔹 GET tous les sessions (Mise à jour pour inclure la recherche)
+export const fetchSession = createAsyncThunk<
   LaravelPaginationResponse,
   { page?: number; search?: string } // 👈 Modification : on attend un objet avec page et search
 >(
-  "rapport/fetchAll",
+  "session/fetchAll",
   async ({ page = 1, search = "" }) => { // 👈 On déstructure et on initialise à vide
     // 👈 Ajout du paramètre search dans la requête Axios
     const response = await axios.get<LaravelPaginationResponse>(
@@ -42,20 +42,20 @@ export const fetchRapports = createAsyncThunk<
   }
 );
 
-// 🔹 CREATE rapport
-export const createRapport = createAsyncThunk(
-  "rapport/create",
-  async (data: Omit<Rapport, "id">) => {
-    const response = await axios.post<Rapport>(API_URL_CREATED, data);
+// 🔹 CREATE session
+export const createSession = createAsyncThunk(
+  "session/create",
+  async (data: Omit<Session, "id">) => {
+    const response = await axios.post<Session>(API_URL_CREATED, data);
     return response.data;
   }
 );
 
-// 🔹 UPDATE rapport
-export const updateRapport = createAsyncThunk(
-  "rapport/update",
-  async (data: Rapport) => {
-    const response = await axios.put<Rapport>(
+// 🔹 UPDATE session
+export const updateSession = createAsyncThunk(
+  "session/update",
+  async (data: Session) => {
+    const response = await axios.put<Session>(
       `${API_URL}/${data.id}`,
       data
     );
@@ -63,9 +63,9 @@ export const updateRapport = createAsyncThunk(
   }
 );
 
-// 🔹 DELETE rapport (Uniquement cette déclaration avec la bonne URL)
-export const deleteRapport = createAsyncThunk(
-  "rapport/delete",
+// 🔹 DELETE session (Uniquement cette déclaration avec la bonne URL)
+export const deleteSession = createAsyncThunk(
+  "session/delete",
   async (id: number) => {
     // 👈 Utilisation de la nouvelle constante API_URL_DELETE
     await axios.delete(`${API_URL_DELETE}/${id}`); 
@@ -73,19 +73,19 @@ export const deleteRapport = createAsyncThunk(
   }
 );
 
-const rapportSlice = createSlice({
-  name: "rapport",
+const sessionSlice = createSlice({
+  name: "session",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
       // GET
-      .addCase(fetchRapports.pending, (state) => {
+      .addCase(fetchSession.pending, (state) => {
         state.loading = true;
       })
-      .addCase(fetchRapports.fulfilled, (state, action) => {
+      .addCase(fetchSession.fulfilled, (state, action) => {
         state.loading = false;
-        state.rapports = action.payload.data;
+        state.sessions = action.payload.data;
 
         // On utilise les clés envoyées par Laravel pour la pagination
         state.pagination = {
@@ -94,24 +94,24 @@ const rapportSlice = createSlice({
           total: action.payload.total
         };
       })
-      .addCase(fetchRapports.rejected, (state, action) => {
+      .addCase(fetchSession.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || "Erreur";
       })
 
       // CREATE
-      .addCase(createRapport.fulfilled, (state, action) => {
-        state.rapports.push(action.payload);
+      .addCase(createSession.fulfilled, (state, action) => {
+        state.sessions.push(action.payload);
         state.loading = false;
-        toast.success('Rapport sauvégardé avec succès!', {
+        toast.success('Session sauvégardée avec succès!', {
           position: "top-right",
           autoClose: 5000,
         });
       })
-      .addCase(createRapport.pending, (state) => {
+      .addCase(createSession.pending, (state) => {
         state.loading = true;
       })
-      .addCase(createRapport.rejected, (state, action) => {
+      .addCase(createSession.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || "Erreur";
         toast.error(state.error || 'Erreur de connexion', {
@@ -121,30 +121,30 @@ const rapportSlice = createSlice({
       })
 
       // UPDATE
-      .addCase(updateRapport.fulfilled, (state, action) => {
-        const index = state.rapports.findIndex(
+      .addCase(updateSession.fulfilled, (state, action) => {
+        const index = state.sessions.findIndex(
           (r) => r.id === action.payload.id
         );
         if (index !== -1) {
-          state.rapports[index] = action.payload;
+          state.sessions[index] = action.payload;
         }
       })
       
       // DELETE
-      .addCase(deleteRapport.fulfilled, (state, action) => {
-        // On retire le rapport supprimé de la liste locale
-        state.rapports = state.rapports.filter(
+      .addCase(deleteSession.fulfilled, (state, action) => {
+        // On retire le session supprimé de la liste locale
+        state.sessions = state.sessions.filter(
           (r) => r.id !== action.payload
         );
         // 👈 Ajout d'une notification de succès
-        toast.success('Rapport supprimé avec succès!', {
+        toast.success('Session supprimé avec succès!', {
           position: "top-right",
           autoClose: 4000,
         });
       })
-      .addCase(deleteRapport.rejected, (state, action) => {
+      .addCase(deleteSession.rejected, (state, action) => {
         // 👈 Ajout d'une notification d'erreur en cas de souci
-        toast.error('Erreur lors de la suppression du rapport', {
+        toast.error('Erreur lors de la suppression de la session', {
           position: "top-right",
           autoClose: 4000,
         });
@@ -153,4 +153,4 @@ const rapportSlice = createSlice({
   },
 });
 
-export default rapportSlice.reducer;
+export default sessionSlice.reducer;
