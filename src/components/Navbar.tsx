@@ -8,12 +8,14 @@ export default function Navbar() {
   
   const location = useLocation(); 
 
-  // 💡 NOUVELLE LOGIQUE : On vérifie les chemins exacts
+  // 💡 RÉCUPÉRATION DE L'UTILISATEUR
+  const userString = localStorage.getItem('user');
+  const currentUser = userString ? JSON.parse(userString) : null;
+
   const isSessionActive = location.pathname === '/session' || location.pathname === '/list_session';
   const isRapportActive = location.pathname === '/rapport' || location.pathname === '/list_rapport';
   const isDepenseActive = location.pathname === '/depenses' || location.pathname === '/list_depense';
 
-  // Ouvre automatiquement le bon sous-menu si on rafraîchit la page
   useEffect(() => {
     if (isSessionActive) setActiveMenu('session');
     if (isRapportActive) setActiveMenu('rapport');
@@ -75,27 +77,27 @@ export default function Navbar() {
 
             <div className="nav-divider">Gestion</div>
 
-            {/* SESSION */}
-            <li className="nav-item">
-              <button 
-                // Application de la nouvelle condition isSessionActive
-                className={`nav-link ${isSessionActive ? 'active' : ''} ${activeMenu === "session" && !isSessionActive ? "expanded" : ""}`} 
-                onClick={() => toggleMenu("session")}
-              >
-                <FiSend className="nav-icon" />
-                <span>Session</span>
-                {activeMenu === "session" ? <FiChevronUp className="nav-arrow" /> : <FiChevronDown className="nav-arrow" />}
-              </button>
-              <ul className={`nav-submenu ${activeMenu === "session" ? "open" : ""}`}>
-                <li><NavLink to="/session" onClick={() => setIsOpen(false)}>Créer une session</NavLink></li>
-                <li><NavLink to="/list_session" onClick={() => setIsOpen(false)}>Toutes les sessions</NavLink></li>
-              </ul>
-            </li>
+            {/* 🔴 SESSION (Visible UNIQUEMENT pour l'administrateur) */}
+            {currentUser && currentUser.role === 'administrateur' && (
+              <li className="nav-item">
+                <button 
+                  className={`nav-link ${isSessionActive ? 'active' : ''} ${activeMenu === "session" && !isSessionActive ? "expanded" : ""}`} 
+                  onClick={() => toggleMenu("session")}
+                >
+                  <FiSend className="nav-icon" />
+                  <span>Session</span>
+                  {activeMenu === "session" ? <FiChevronUp className="nav-arrow" /> : <FiChevronDown className="nav-arrow" />}
+                </button>
+                <ul className={`nav-submenu ${activeMenu === "session" ? "open" : ""}`}>
+                  <li><NavLink to="/session" onClick={() => setIsOpen(false)}>Créer une session</NavLink></li>
+                  <li><NavLink to="/list_session" onClick={() => setIsOpen(false)}>Toutes les sessions</NavLink></li>
+                </ul>
+              </li>
+            )}
 
             {/* RAPPORTS */}
             <li className="nav-item">
               <button 
-                 // Application de la nouvelle condition isRapportActive
                 className={`nav-link ${isRapportActive ? 'active' : ''} ${activeMenu === "rapport" && !isRapportActive ? "expanded" : ""}`} 
                 onClick={() => toggleMenu("rapport")}
               >
@@ -110,41 +112,42 @@ export default function Navbar() {
             </li>
 
             <div className="nav-divider">Finances & Contacts</div>
-
-            {/* DÉPENSES */}
-          
-
+                 {/* DÉPENSES */}
               <li className="nav-item">
               <button 
-                 // Application de la nouvelle condition isRapportActive
                 className={`nav-link ${isDepenseActive ? 'active' : ''} ${activeMenu === "depense" && !isDepenseActive ? "expanded" : ""}`} 
-                onClick={() => toggleMenu("depenses")}
+                onClick={() => toggleMenu("depense")}
               >
-               <FiDollarSign className="nav-icon" />
+                 <FiDollarSign className="nav-icon" />
                 <span>Dépenses</span>
-                {activeMenu === "depenses" ? <FiChevronUp className="nav-arrow" /> : <FiChevronDown className="nav-arrow" />}
+                {activeMenu === "depense" ? <FiChevronUp className="nav-arrow" /> : <FiChevronDown className="nav-arrow" />}
               </button>
-              <ul className={`nav-submenu ${activeMenu === "depenses" ? "open" : ""}`}>
-                <li><NavLink to="/depenses" onClick={() => setIsOpen(false)}>Nouvelle dépense</NavLink></li>
-                <li><NavLink to="/list_depense" onClick={() => setIsOpen(false)}>Toutes les dépenses</NavLink></li>
+              <ul className={`nav-submenu ${activeMenu === "depense" ? "open" : ""}`}>
+                <li><NavLink to="/depenses" onClick={() => setIsOpen(false)}>Créer un depense</NavLink></li>
+                <li><NavLink to="/list_depense" onClick={() => setIsOpen(false)}>Tous les depenses</NavLink></li>
               </ul>
             </li>
 
+         
+           
+
             {/* PARTENAIRES */}
             <li className="nav-item">
-              <NavLink to="/partenaire" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={() => setIsOpen(false)}>
+              <NavLink to="/partenaires" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={() => setIsOpen(false)}>
                 <FiUsers className="nav-icon" />
                 <span>Partenaires</span>
               </NavLink>
             </li>
 
-            {/* UTILISATEURS */}
-            <li className="nav-item">
-              <NavLink to="/users" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={() => setIsOpen(false)}>
-                <FiUsers className="nav-icon" />
-                <span>Utilisateurs</span>
-              </NavLink>
-            </li>
+            {/* 🔴 UTILISATEURS (Visible UNIQUEMENT pour l'administrateur) */}
+            {currentUser && currentUser.role === 'administrateur' && (
+              <li className="nav-item">
+                <NavLink to="/utilisateurs" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={() => setIsOpen(false)}>
+                  <FiUsers className="nav-icon" />
+                  <span>Utilisateurs</span>
+                </NavLink>
+              </li>
+            )}
 
           </ul>
         </div>
@@ -194,7 +197,6 @@ export default function Navbar() {
         
         .nav-item { display: flex; flex-direction: column; }
 
-        /* Liens principaux */
         .nav-link {
           display: flex; align-items: center; width: 100%; padding: 12px 16px; border-radius: 12px;
           color: var(--text-muted); text-decoration: none; font-weight: 600; font-size: 15px;
@@ -203,7 +205,6 @@ export default function Navbar() {
 
         .nav-link:hover, .nav-link.expanded { background-color: var(--hover-bg); color: #ffffff; }
 
-        /* Le fameux badge bleu ! */
         .nav-link.active {
           background-color: var(--primary-color);
           color: #ffffff;
@@ -213,12 +214,10 @@ export default function Navbar() {
         .nav-icon { font-size: 20px; margin-right: 14px; min-width: 20px; }
         .nav-arrow { margin-left: auto; font-size: 18px; }
 
-        /* Sous-menus */
         .nav-submenu { list-style: none; padding: 0; margin: 0; max-height: 0; overflow: hidden; transition: max-height var(--transition-speed) ease; }
         .nav-submenu.open { max-height: 200px; margin-top: 4px; }
         .nav-submenu li a { display: block; padding: 10px 16px 10px 50px; color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 8px; transition: all 0.2s ease; }
         
-        /* Les liens de sous-menu s'allument en blanc quand on est dessus pour bien se repérer */
         .nav-submenu li a:hover, .nav-submenu li a.active {
           color: #ffffff;
           font-weight: 700;

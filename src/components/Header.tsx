@@ -1,10 +1,33 @@
 import React from 'react';
-// Importation des icônes pour remplacer les anciennes classes "feather-*"
-import { FiFilter, FiPlus, FiAlignRight } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+// Importation des icônes (Ajout de FiLogOut)
+import { FiFilter, FiPlus, FiAlignRight, FiLogOut } from 'react-icons/fi';
 
 export default function Header() {
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        try {
+            // 1. (Optionnel mais recommandé) Avertir Laravel de détruire le token côté serveur
+            await axios.post('http://127.0.0.1:8000/api/logout');
+        } catch (error) {
+            console.error("Erreur lors de la déconnexion serveur", error);
+        } finally {
+            // 2. Supprimer les données locales du navigateur
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user');
+
+            // 3. Retirer le token par défaut d'Axios
+            delete axios.defaults.headers.common['Authorization'];
+
+            // 4. Rediriger l'utilisateur vers la page de connexion
+            navigate('/login');
+        }
+    };
+
     return (
-        <div className="modern-header shadow-sm">
+        <div className="modern-header shadow-sm bg-white">
             <div className="d-flex justify-content-between align-items-center w-100">
                 
                 {/* Section Gauche : Titre & Fil d'Ariane (Breadcrumb) */}
@@ -28,62 +51,63 @@ export default function Header() {
                     {/* Menu déroulant des filtres */}
                     <div className="dropdown">
                         <button 
-                            className="btn btn-light d-flex align-items-center shadow-sm" 
+                            className="btn btn-light d-flex align-items-center gap-2 border-0 fw-bold px-3 py-2" 
                             type="button" 
                             data-bs-toggle="dropdown" 
                             aria-expanded="false"
-                            style={{ borderRadius: '12px', padding: '10px 18px', fontWeight: '600', color: '#475467', backgroundColor: '#ffffff', border: '1px solid #e9ecef' }}
+                            style={{ borderRadius: '12px', color: '#475467' }}
                         >
-                            <FiFilter className="me-2" />
-                            <span>Filtrer</span>
+                            <FiFilter />
+                            Filtres
                         </button>
-                        
-                        <ul className="dropdown-menu dropdown-menu-end shadow-lg border-0" style={{ borderRadius: '16px', padding: '12px', minWidth: '220px' }}>
-                            {['Rôle', 'Équipe', 'Email', 'Membre', 'Recommandation'].map((item) => (
-                                <li key={item}>
-                                    <div className="form-check custom-checkbox px-3 py-2">
-                                        <input className="form-check-input" type="checkbox" id={item} defaultChecked />
-                                        <label className="form-check-label c-pointer ms-2 fw-medium text-dark" htmlFor={item}>
-                                            {item}
+                        <ul className="dropdown-menu shadow-sm border-0 mt-2 p-2" style={{ borderRadius: '16px', minWidth: '200px' }}>
+                            <li><a className="dropdown-item fw-semibold text-muted py-2" href="#">Ce mois</a></li>
+                            <li><a className="dropdown-item fw-semibold text-muted py-2" href="#">Le mois dernier</a></li>
+                            <li><hr className="dropdown-divider opacity-10" /></li>
+                            <li>
+                                <div className="dropdown-item custom-checkbox py-2">
+                                    <div className="form-check">
+                                        <input className="form-check-input" type="checkbox" id="checkTermines" />
+                                        <label className="form-check-label fw-semibold text-muted" htmlFor="checkTermines">
+                                            Rapports clôturés
                                         </label>
                                     </div>
-                                </li>
-                            ))}
-                            <li><hr className="dropdown-divider my-2" /></li>
-                            <li>
-                                <a className="dropdown-item d-flex align-items-center text-primary fw-bold py-2" href="#!">
-                                    <FiPlus className="me-2" size={18} /> Créer Nouveau
-                                </a>
-                            </li>
-                            <li>
-                                <a className="dropdown-item d-flex align-items-center text-muted py-2" href="#!">
-                                    <FiFilter className="me-2" size={18} /> Gérer les filtres
-                                </a>
+                                </div>
                             </li>
                         </ul>
                     </div>
 
-                    {/* Bouton Ajouter Widget (Masqué sur très petits écrans) */}
+                    {/* Bouton Nouveau Rapport */}
                     <button 
-                        className="btn btn-primary d-none d-md-flex align-items-center shadow-sm"
-                        style={{ borderRadius: '12px', padding: '10px 20px', fontWeight: '600' }}
+                        className="btn btn-primary d-flex align-items-center gap-2 shadow-sm px-4 py-2"
+                        style={{ borderRadius: '12px', fontWeight: '600' }}
                     >
-                        <FiPlus className="me-2" size={20} />
-                        <span>Ajouter Widget</span>
+                        <FiPlus size={18} />
+                        Nouveau
                     </button>
 
-                    {/* Bouton pour menu mobile */}
-                    <button className="btn btn-light d-md-none d-flex align-items-center p-2 shadow-sm" style={{ borderRadius: '10px', backgroundColor: '#ffffff', border: '1px solid #e9ecef' }}>
-                        <FiAlignRight size={24} color="#2b3674" />
+                    {/* 🔴 NOUVEAU : Bouton de Déconnexion */}
+                    <button 
+                        onClick={handleLogout}
+                        className="btn btn-danger-soft d-flex align-items-center gap-2 px-3 py-2"
+                        title="Se déconnecter"
+                    >
+                        <FiLogOut size={18} />
+                        <span className="d-none d-md-inline fw-bold">Déconnexion</span>
                     </button>
+
+                    {/* Bouton Toggle pour Mobile (Optionnel si tu gères la sidebar ailleurs) */}
+                    <button className="btn btn-light d-lg-none p-2" style={{ borderRadius: '10px' }}>
+                        <FiAlignRight size={20} />
+                    </button>
+
                 </div>
             </div>
 
-            {/* Styles intégrés spécifiques au Header */}
+            {/* Styles intégrés pour le composant Header */}
             <style>{`
                 .modern-header {
-                    background-color: rgba(255, 255, 255, 0.85); /* Fond blanc légèrement transparent */
-                    backdrop-filter: blur(12px); /* Effet de flou moderne (Glassmorphism) */
+                    background-color: #ffffff;
                     padding: 20px 28px;
                     border-radius: 20px; /* Bords bien arrondis */
                     margin-bottom: 28px;
@@ -123,6 +147,21 @@ export default function Header() {
                 .dropdown-item:hover {
                     background-color: #f4f7fe;
                     transform: translateX(3px); /* Petite animation au survol */
+                }
+
+                /* 🔴 Style personnalisé pour le bouton de déconnexion Soft UI */
+                .btn-danger-soft {
+                    background-color: #fee4e2;
+                    color: #d92d20;
+                    border: none;
+                    border-radius: 12px;
+                    transition: all 0.2s ease;
+                }
+
+                .btn-danger-soft:hover {
+                    background-color: #fec3c0;
+                    color: #b42318;
+                    transform: translateY(-1px);
                 }
             `}</style>
         </div>
