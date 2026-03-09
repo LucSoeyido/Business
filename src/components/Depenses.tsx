@@ -1,5 +1,4 @@
 import Navbar from "./Navbar";
-import Header from "./Header";
 import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import { useNavigate } from 'react-router-dom';
@@ -36,7 +35,7 @@ export default function Depenses() {
         const fetchLatestSession = async () => {
             try {
                 // Remplace par la bonne URL de base si nécessaire
-                const response = await axios.get('http://127.0.0.1:8000/api/sessions/latest-active');
+                const response = await axios.get('https://apibusiness.lucky-dev.com/api/sessions/latest-active');
 
                 if (response.data && response.data.id) {
                     setActiveSession(response.data);
@@ -76,7 +75,7 @@ export default function Depenses() {
                 
                 <div className="main-content py-3 px-3 px-md-4">
                     
-                    <Header />
+                  
                     
 
                     <div className="row justify-content-center m-0">

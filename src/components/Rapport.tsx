@@ -1,5 +1,4 @@
 import Navbar from "./Navbar";
-import Header from "./Header"; // N'oublie pas d'importer ton nouveau Header !
 import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -39,7 +38,7 @@ export default function Rapport() {
         const fetchLatestSession = async () => {
             try {
                 // Remplace par la bonne URL de base si nécessaire
-                const response = await axios.get('http://127.0.0.1:8000/api/sessions/latest-active');
+                const response = await axios.get('https://apibusiness.lucky-dev.com/api/sessions/latest-active');
 
                 if (response.data && response.data.id) {
                     setActiveSession(response.data);
@@ -81,7 +80,7 @@ export default function Rapport() {
                 <div className="main-content py-3 px-3 px-md-4">
 
                     {/* Ajout de ton bel en-tête ici ! */}
-                    <Header />
+
 
                     {/* Centrage de la carte pour éviter qu'elle ne soit trop étirée sur les grands écrans */}
                     <div className="row justify-content-center m-0">
@@ -129,9 +128,15 @@ export default function Rapport() {
                                                 <option value="Eugène">Eugène</option>
                                                 <option value="Démarcheur">Démarcheur</option>
                                                 <option value="Maman Doky">Maman Doky</option>
+                                                <option value="Bonnet"> Bonnet</option>
                                                 <option value="Adélin">Adélin</option>
+                                                <option value="Djifa">Djifa</option>
+                                                <option value="Dora">Dora</option>
                                                 <option value="Tassi justine">Tassi justine</option>
                                                 <option value="josephine">josephine</option>
+                                                <option value="Fogan_Didier">Fogan_Didier</option>
+                                                <option value="Marc">Marc</option>
+                                                <option value="FK">FK</option>
                                                 <option value="Autres">Autres</option>
                                             </select>
                                         </div>

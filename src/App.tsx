@@ -47,6 +47,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route path='/' element={<Dashboard />}>
           </Route>
+          <Route path='/list_session' element={<ListSession />}></Route>
 
           <Route path='/rapport' element={<Rapport />}></Route>
           <Route path='/depenses' element={<Depenses />}></Route>
@@ -56,7 +57,7 @@ function App() {
         </Route>
         {/* 🔴 ROUTES ULTRA-PROTÉGÉES (Accessibles UNIQUEMENT aux administrateurs) */}
         <Route element={<ProtectedRoute allowedRoles={['administrateur']} />}>
-          <Route path='/list_session' element={<ListSession />}></Route>
+          
           <Route path='/session' element={<Session />}>
           </Route>
           <Route path="/utilisateurs" element={<div className="p-5 text-center">Page Utilisateurs (Admin Only)</div>} />

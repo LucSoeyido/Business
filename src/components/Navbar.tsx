@@ -1,12 +1,33 @@
 import { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { FiGrid, FiSend, FiUsers, FiDollarSign, FiFileText, FiChevronDown, FiChevronUp, FiMenu, FiX } from "react-icons/fi";
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { FiGrid, FiSend, FiUsers, FiDollarSign, FiFileText, FiChevronDown, FiChevronUp, FiMenu, FiX, FiLogOut } from "react-icons/fi";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
-  
-  const location = useLocation(); 
+   const handleLogout = async () => {
+    try {
+      // 1. (Optionnel mais recommandé) Avertir Laravel de détruire le token côté serveur
+      await axios.post('http://127.0.0.1:8000/api/logout');
+    } catch (error) {
+      console.error("Erreur lors de la déconnexion serveur", error);
+    } finally {
+      // 2. Supprimer les données locales du navigateur
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user');
+
+      // 3. Retirer le token par défaut d'Axios
+      delete axios.defaults.headers.common['Authorization'];
+
+      // 4. Rediriger l'utilisateur vers la page de connexion
+      navigate('/login');
+    }
+  };
+
+  const location = useLocation();
 
   // 💡 RÉCUPÉRATION DE L'UTILISATEUR
   const userString = localStorage.getItem('user');
@@ -40,11 +61,23 @@ export default function Navbar() {
     };
   }, [isOpen]);
 
+ 
+
   return (
     <>
       {/* ===== MOBILE TOPBAR ===== */}
       <div className="mobile-topbar shadow-sm">
         <h5 className="mobile-logo fw-bolder mb-0">Lucky Business</h5>
+        {/* Bouton de Déconnexion mobile */}
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="mobile-logout-btn"
+          title="Se déconnecter"
+        >
+          <FiLogOut size={18} />
+          <span className="d-none d-sm-inline">Déconnexion</span>
+        </button>
         <button
           className="mobile-toggle-btn"
           onClick={() => setIsOpen(!isOpen)}
@@ -59,11 +92,10 @@ export default function Navbar() {
 
       {/* ===== SIDEBAR ===== */}
       <aside className={`modern-sidebar shadow-sm ${isOpen ? "open" : ""}`}>
-        
+
         <div className="sidebar-header">
           <h3 className="brand-title">Lucky Business</h3>
         </div>
-
         <div className="sidebar-content">
           <ul className="sidebar-nav">
 
@@ -80,8 +112,8 @@ export default function Navbar() {
             {/* 🔴 SESSION (Visible UNIQUEMENT pour l'administrateur) */}
             {currentUser && currentUser.role === 'administrateur' && (
               <li className="nav-item">
-                <button 
-                  className={`nav-link ${isSessionActive ? 'active' : ''} ${activeMenu === "session" && !isSessionActive ? "expanded" : ""}`} 
+                <button
+                  className={`nav-link ${isSessionActive ? 'active' : ''} ${activeMenu === "session" && !isSessionActive ? "expanded" : ""}`}
                   onClick={() => toggleMenu("session")}
                 >
                   <FiSend className="nav-icon" />
@@ -97,8 +129,8 @@ export default function Navbar() {
 
             {/* RAPPORTS */}
             <li className="nav-item">
-              <button 
-                className={`nav-link ${isRapportActive ? 'active' : ''} ${activeMenu === "rapport" && !isRapportActive ? "expanded" : ""}`} 
+              <button
+                className={`nav-link ${isRapportActive ? 'active' : ''} ${activeMenu === "rapport" && !isRapportActive ? "expanded" : ""}`}
                 onClick={() => toggleMenu("rapport")}
               >
                 <FiFileText className="nav-icon" />
@@ -112,13 +144,13 @@ export default function Navbar() {
             </li>
 
             <div className="nav-divider">Finances & Contacts</div>
-                 {/* DÉPENSES */}
-              <li className="nav-item">
-              <button 
-                className={`nav-link ${isDepenseActive ? 'active' : ''} ${activeMenu === "depense" && !isDepenseActive ? "expanded" : ""}`} 
+            {/* DÉPENSES */}
+            <li className="nav-item">
+              <button
+                className={`nav-link ${isDepenseActive ? 'active' : ''} ${activeMenu === "depense" && !isDepenseActive ? "expanded" : ""}`}
                 onClick={() => toggleMenu("depense")}
               >
-                 <FiDollarSign className="nav-icon" />
+                <FiDollarSign className="nav-icon" />
                 <span>Dépenses</span>
                 {activeMenu === "depense" ? <FiChevronUp className="nav-arrow" /> : <FiChevronDown className="nav-arrow" />}
               </button>
@@ -128,8 +160,25 @@ export default function Navbar() {
               </ul>
             </li>
 
-         
-           
+              {currentUser && currentUser.role === 'secretaire' && (
+              <li className="nav-item">
+                <button
+                  className={`nav-link ${isSessionActive ? 'active' : ''} ${activeMenu === "session" && !isSessionActive ? "expanded" : ""}`}
+                  onClick={() => toggleMenu("session")}
+                >
+                  <FiSend className="nav-icon" />
+                  <span>Session</span>
+                  {activeMenu === "session" ? <FiChevronUp className="nav-arrow" /> : <FiChevronDown className="nav-arrow" />}
+                </button>
+                <ul className={`nav-submenu ${activeMenu === "session" ? "open" : ""}`}>
+                
+                  <li><NavLink to="/list_session" onClick={() => setIsOpen(false)}>Toutes les sessions</NavLink></li>
+                </ul>
+              </li>
+            )}
+
+
+
 
             {/* PARTENAIRES */}
             <li className="nav-item">
@@ -151,6 +200,18 @@ export default function Navbar() {
 
           </ul>
         </div>
+        {/* Bouton de Déconnexion */}
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="sidebar-logout-btn"
+          title="Se déconnecter"
+        >
+          <FiLogOut size={18} />
+          <span>Déconnexion</span>
+        </button>
+
+        
       </aside>
 
       {/* ===== STYLES CSS ===== */}
@@ -221,6 +282,33 @@ export default function Navbar() {
         .nav-submenu li a:hover, .nav-submenu li a.active {
           color: #ffffff;
           font-weight: 700;
+        }
+
+        .sidebar-logout-btn {
+          display: flex; align-items: center; gap: 10px;
+          width: calc(100% - 32px); margin: 8px 16px 0;
+          padding: 11px 16px; border-radius: 12px; border: none; cursor: pointer;
+          background-color: rgba(220, 38, 38, 0.15);
+          color: #fc8181; font-weight: 600; font-size: 15px;
+          transition: all 0.2s ease;
+        }
+
+        .sidebar-logout-btn:hover {
+          background-color: rgba(220, 38, 38, 0.3);
+          color: #fff;
+        }
+
+        .mobile-logout-btn {
+          display: flex; align-items: center; gap: 6px;
+          padding: 8px 14px; border-radius: 10px; border: none; cursor: pointer;
+          background-color: rgba(220, 38, 38, 0.15);
+          color: #fc8181; font-weight: 600; font-size: 14px;
+          transition: all 0.2s ease;
+        }
+
+        .mobile-logout-btn:hover {
+          background-color: rgba(220, 38, 38, 0.3);
+          color: #fff;
         }
 
         @media (max-width: 1023px) {

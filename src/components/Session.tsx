@@ -1,5 +1,4 @@
 import Navbar from "./Navbar";
-import Header from "./Header";
 import React, { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import { useNavigate } from 'react-router-dom';
@@ -58,7 +57,7 @@ export default function Session() {
                 <div className="main-content py-3 px-3 px-md-4">
 
                     {/* Ton bel en-tête */}
-                    <Header />
+                    
 
                     {/* Centrage de la carte pour éviter qu'elle ne soit trop étirée sur les grands écrans */}
                     <div className="row justify-content-center m-0">

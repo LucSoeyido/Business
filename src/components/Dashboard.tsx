@@ -44,7 +44,7 @@ export default function Dashboard() {
 
     const fetchStats = async () => {
       try {
-        const response = await axios.get(`http://127.0.0.1:8000/api/dashboard-stats?year=${selectedYear}`);
+        const response = await axios.get(`https://apibusiness.lucky-dev.com/api/dashboard-stats?year=${selectedYear}`);
         setStats(response.data);
       } catch (error) {
         console.error("Erreur lors de la récupération des statistiques", error);
@@ -83,7 +83,7 @@ export default function Dashboard() {
 
       <main className="main-wrapper" style={{ backgroundColor: '#f4f7fe' }}>
         <div className="main-content py-3 px-3 px-md-4">
-          <Header />
+         
 
           {/* 💡 2. AFFICHAGE CONDITIONNEL SELON LE RÔLE */}
           {isSecretaire ? (
@@ -242,7 +242,7 @@ export default function Dashboard() {
                       </div>
                       
                       <div style={{ width: '100%', height: 350 }}>
-                        <ResponsiveContainer>
+                        <ResponsiveContainer width="100%" height="100%">
                           <LineChart data={stats.chart_data} margin={{ top: 10, right: 20, left: 10, bottom: 0 }}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e9ecef" />
                             <XAxis 
@@ -287,26 +287,59 @@ export default function Dashboard() {
       </main>
 
       <style>{`
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
         .main-wrapper {
-            margin-left: 280px; 
+            margin-left: 280px;
             min-height: 100vh;
             transition: margin-left 0.3s ease;
+            /* NE PAS mettre overflow:hidden ici — ça casse Recharts sur desktop */
+            box-sizing: border-box;
         }
-        
-        /* 💡 Style pour l'animation des boutons du secrétaire au survol */
+
+        .main-content {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .row {
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        .col-12, .col-md-6 {
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+
         .action-card {
             transition: all 0.3s ease;
         }
-        
+
         .action-card:hover {
             transform: translateY(-8px);
             box-shadow: 0 15px 30px rgba(0,0,0,0.08) !important;
         }
-        
+
         @media (max-width: 1023px) {
             .main-wrapper {
                 margin-left: 0;
-                padding-top: 70px; 
+                padding-top: 70px;
+                width: 100%;
+                max-width: 100vw;
+            }
+
+            .card {
+                max-width: 100%;
+                box-sizing: border-box;
+            }
+
+            .main-content {
+                padding-left: 12px !important;
+                padding-right: 12px !important;
             }
         }
       `}</style>

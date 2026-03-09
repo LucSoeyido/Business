@@ -3,9 +3,9 @@ import axios from "axios";
 import type { Rapport, RapportState } from "../../types/rapport"
 import { toast } from 'react-toastify';
 
-const API_URL = "http://127.0.0.1:8000/api/all_rapport";
-const API_URL_CREATED = "http://127.0.0.1:8000/api/store_rapport";
-const API_URL_DELETE = "http://127.0.0.1:8000/api/delete_rapport";
+const API_URL = "https://apibusiness.lucky-dev.com/api/all_rapport";
+const API_URL_CREATED = "https://apibusiness.lucky-dev.com/api/store_rapport";
+const API_URL_DELETE = "https://apibusiness.lucky-dev.com/api/delete_rapport";
 
 interface LaravelPaginationResponse {
   data: any[]; // Remplace any par ton type Rapport si tu en as un

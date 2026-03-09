@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 // Importation des icônes (Ajout de FiLogOut)
@@ -6,11 +6,14 @@ import { FiFilter, FiPlus, FiAlignRight, FiLogOut } from 'react-icons/fi';
 
 export default function Header() {
     const navigate = useNavigate();
+    const userString = localStorage.getItem('user');
+    const currentUser = userString ? JSON.parse(userString) : null;
+    
 
     const handleLogout = async () => {
         try {
             // 1. (Optionnel mais recommandé) Avertir Laravel de détruire le token côté serveur
-            await axios.post('http://127.0.0.1:8000/api/logout');
+            await axios.post('https://apibusiness.lucky-dev.com/api/logout');
         } catch (error) {
             console.error("Erreur lors de la déconnexion serveur", error);
         } finally {
@@ -29,10 +32,10 @@ export default function Header() {
     return (
         <div className="modern-header shadow-sm bg-white">
             <div className="d-flex justify-content-between align-items-center w-100">
-                
+
                 {/* Section Gauche : Titre & Fil d'Ariane (Breadcrumb) */}
                 <div className="header-left">
-                    <h4 className="header-title fw-bolder mb-1">Rapports</h4>
+                    <h4 className="header-title fw-bolder mb-1">Bienvenue, {currentUser.name}</h4>
                     <nav aria-label="breadcrumb">
                         <ol className="breadcrumb mb-0">
                             <li className="breadcrumb-item">
@@ -47,47 +50,15 @@ export default function Header() {
 
                 {/* Section Droite : Actions & Boutons */}
                 <div className="header-right d-flex align-items-center gap-3">
-                    
+
                     {/* Menu déroulant des filtres */}
-                    <div className="dropdown">
-                        <button 
-                            className="btn btn-light d-flex align-items-center gap-2 border-0 fw-bold px-3 py-2" 
-                            type="button" 
-                            data-bs-toggle="dropdown" 
-                            aria-expanded="false"
-                            style={{ borderRadius: '12px', color: '#475467' }}
-                        >
-                            <FiFilter />
-                            Filtres
-                        </button>
-                        <ul className="dropdown-menu shadow-sm border-0 mt-2 p-2" style={{ borderRadius: '16px', minWidth: '200px' }}>
-                            <li><a className="dropdown-item fw-semibold text-muted py-2" href="#">Ce mois</a></li>
-                            <li><a className="dropdown-item fw-semibold text-muted py-2" href="#">Le mois dernier</a></li>
-                            <li><hr className="dropdown-divider opacity-10" /></li>
-                            <li>
-                                <div className="dropdown-item custom-checkbox py-2">
-                                    <div className="form-check">
-                                        <input className="form-check-input" type="checkbox" id="checkTermines" />
-                                        <label className="form-check-label fw-semibold text-muted" htmlFor="checkTermines">
-                                            Rapports clôturés
-                                        </label>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
+                
 
                     {/* Bouton Nouveau Rapport */}
-                    <button 
-                        className="btn btn-primary d-flex align-items-center gap-2 shadow-sm px-4 py-2"
-                        style={{ borderRadius: '12px', fontWeight: '600' }}
-                    >
-                        <FiPlus size={18} />
-                        Nouveau
-                    </button>
+                   
 
                     {/* 🔴 NOUVEAU : Bouton de Déconnexion */}
-                    <button 
+                    <button
                         onClick={handleLogout}
                         className="btn btn-danger-soft d-flex align-items-center gap-2 px-3 py-2"
                         title="Se déconnecter"
